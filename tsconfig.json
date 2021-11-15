@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"target": "ES2021",
+		"outDir": "dist",
+		"forceConsistentCasingInFileNames": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"noErrorTruncation": true,
+		"useUnknownInCatchVariables": false,
+		"alwaysStrict": true,
+		"strict": false,
+		"noImplicitOverride": true,
+		"declarationMap": true,
+		"declaration": true,
+		"sourceMap": true,
+		"noEmitHelpers": true,
+		"importHelpers": true
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
+}

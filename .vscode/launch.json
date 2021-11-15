@@ -1,0 +1,23 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"name": "Test",
+			"command": "yarn build && yarn test",
+			"skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/axios/lib/utils.js"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"resolveSourceMapLocations": ["${workspaceFolder}/**"],
+			"sourceMaps": true
+		},
+		{
+			"type": "node-terminal",
+			"name": "Run Script: test",
+			"request": "launch",
+			"command": "yarn run test",
+			"cwd": "${workspaceFolder}",
+			"skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/axios/lib/utils.js"]
+		}
+	]
+}
