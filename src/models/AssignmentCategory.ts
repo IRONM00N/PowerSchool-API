@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from "..";
 import { AsmtCatVO } from "../types";
 import type Assignment from "./Assignment";
 
@@ -6,7 +6,7 @@ import type Assignment from "./Assignment";
  * A category for a PowerSchool assignment.
  */
 export default class AssignmentCategory {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The ID of this assignment.
@@ -42,33 +42,33 @@ export default class AssignmentCategory {
 	 * @internal
 	 */
 	public constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		name: string | null,
 		abbreviation: string | null,
 		description: string | null,
 		gradeBookType: number
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
-		this.name = name ?? null;
+		this._cache = cache ?? null;
 		this.abbreviation = abbreviation ?? null;
+		this.assignments = [];
 		this.description = description ?? null;
 		this.gradeBookType = gradeBookType ?? null;
-		this.assignments = [];
+		this.id = id ?? null;
+		this.name = name ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	public static fromData(data: AsmtCatVO, api: PowerSchoolAPI) {
+	public static fromData(data: AsmtCatVO, cache: CacheInfo) {
 		return new AssignmentCategory(
-			api,
-			data.id != null ? data.id : null,
+			cache,
+			data.id != null ? data.id : null!,
 			data.name,
 			data.abbreviation,
 			data.description,
-			data.gradeBookType != null ? +data.gradeBookType : null
+			data.gradeBookType != null ? +data.gradeBookType : null!
 		);
 	}
 }

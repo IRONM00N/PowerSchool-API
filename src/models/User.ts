@@ -1,20 +1,20 @@
+import type PowerSchoolAPI from "../index";
+import { getStudentDataResponse, QueryIncludeListVO, UserSessionVO } from "../types";
+import Assignment from "./Assignment";
+import AssignmentCategory from "./AssignmentCategory";
+import AssignmentScore from "./AssignmentScore";
+import AttendanceCode from "./AttendanceCode";
+import AttendanceRecord from "./AttendanceRecord";
+import Course from "./Course";
 import Event from "./Event";
-import Term from "./Term";
+import FinalGrade from "./FinalGrade";
 import Period from "./Period";
 import ReportingTerm from "./ReportingTerm";
-import Course from "./Course";
+import School from "./School";
 import Student from "./Student";
 import StudentInfo from "./StudentInfo";
-import School from "./School";
 import Teacher from "./Teacher";
-import Assignment from "./Assignment";
-import AssignmentScore from "./AssignmentScore";
-import AssignmentCategory from "./AssignmentCategory";
-import AttendanceRecord from "./AttendanceRecord";
-import AttendanceCode from "./AttendanceCode";
-import FinalGrade from "./FinalGrade";
-import type PowerSchoolAPI from "../index";
-import { getStudentDataResponse, QueryIncludeListVO, StudentDataVO, UserSessionVO } from "../types";
+import Term from "./Term";
 
 /**
  * A PowerSchool API user, which holds information about the user and methods to interact with them.
@@ -27,6 +27,9 @@ export default class User {
 	declare studentData: StudentInfo[];
 	declare rawResult: getStudentDataResponse | null;
 
+	/**
+	 * @internal
+	 */
 	constructor(session: UserSessionVO, api: PowerSchoolAPI) {
 		this.session = session ?? null;
 		if (this.session.serverCurrentTime) {
@@ -89,81 +92,60 @@ export default class User {
 			data = notNull(data);
 
 			// Deserialize any data we might need for special types
-			const schools = this.safelyParseUnpredictableArray(data.schools).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("schools");
-					console.dir(data);
-				} */
-				return School.fromData(data!, this.api);
-			}); // for some reason sometimes is an array, sometimes is one school.
-			const teachers = this.safelyParseUnpredictableArray(data.teachers).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("teachers");
-					console.dir(data);
-				} */
-				return Teacher.fromData(data!);
-			});
-			const terms = this.safelyParseUnpredictableArray(data.terms).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("terms");
-					console.dir(data);
-				} */
-				return Term.fromData(data!, this.api);
-			});
-			const reportingTerms = this.safelyParseUnpredictableArray(data.reportingTerms).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("reportingTerms");
-					console.dir(data);
-				} */
-				return ReportingTerm.fromData(data!, this.api);
-			});
-			const assignments = this.safelyParseUnpredictableArray(data.assignments).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("assignments");
-					console.dir(data);
-				} */
-				return Assignment.fromData(data!, this.api);
-			});
+			const schools = this.safelyParseUnpredictableArray(data.schools).map((data) =>
+				School.fromData(data!, this.api._cachedInfo)
+			); // for some reason sometimes is an array, sometimes is one school.
+			const teachers = this.safelyParseUnpredictableArray(data.teachers).map((data) => Teacher.fromData(data!));
+			const terms = this.safelyParseUnpredictableArray(data.terms).map((data) =>
+				Term.fromData(data!, this.api._cachedInfo)
+			);
+			const reportingTerms = this.safelyParseUnpredictableArray(data.reportingTerms).map((data) =>
+				ReportingTerm.fromData(data!, this.api._cachedInfo)
+			);
+			const assignments = this.safelyParseUnpredictableArray(data.assignments).map((data) =>
+				Assignment.fromData(data!, this.api._cachedInfo)
+			);
 			const assignmentScores = this.safelyParseUnpredictableArray(data.assignmentScores).map((data, j) => {
-				/* if (i === 0 && j === 0) {
+				if (i === 0 && j === 0) {
 					console.log("assignmentScores");
 					console.dir(data);
-				} */
-				return AssignmentScore.fromData(data!, this.api);
+					console.dir(AssignmentScore.fromData(data!, this.api._cachedInfo));
+				}
+				return AssignmentScore.fromData(data!, this.api._cachedInfo);
 			});
 			const attendanceCodes = this.safelyParseUnpredictableArray(data.attendanceCodes).map((data, j) => {
 				/* if (i === 0 && j === 0) {
 					console.log("attendanceCodes");
 					console.dir(data);
 				} */
-				return AttendanceCode.fromData(data!, this.api);
+				return AttendanceCode.fromData(data!, this.api._cachedInfo);
 			});
 			const periods = this.safelyParseUnpredictableArray(data.periods).map((data, j) => {
 				/* if (i === 0 && j === 0) {
 					console.log("periods");
 					console.dir(data);
 				} */
-				return Period.fromData(data!, this.api);
+				return Period.fromData(data!, this.api._cachedInfo);
 			});
 			const courses = this.safelyParseUnpredictableArray(data.sections).map((data, j) => {
 				/* if (i === 0 && j === 0) {
 					console.log("sections");
 					console.dir(data);
 				} */
-				return Course.fromData(data!, this.api);
+				return Course.fromData(data!, this.api._cachedInfo);
 			});
 			const finalGrades = this.safelyParseUnpredictableArray(data.finalGrades).map((data, j) => {
 				/* if (i === 0 && j === 0) {
 					console.log("finalGrades");
 					console.dir(data);
 				} */
-				return FinalGrade.fromData(data!, this.api);
+				return FinalGrade.fromData(data!, this.api._cachedInfo);
 			});
 
 			// Add assignments to their categories
 			const assignmentCategories: Record<string, AssignmentCategory> = {};
 			this.safelyParseUnpredictableArray(data.assignmentCategories).forEach(
-				(data) => (assignmentCategories[data!.id] = AssignmentCategory.fromData(data!, this.api))
+				(data) => (assignmentCategories[data!.id] = AssignmentCategory.fromData(data!, this.api._cachedInfo))
 			);
 			assignments
 				.filter((a) => assignmentCategories[a.categoryID])
@@ -190,13 +172,13 @@ export default class User {
 			studentData.terms = terms;
 			studentData.reportingTerms = reportingTerms;
 			studentData.notInSessionDays = this.safelyParseUnpredictableArray(data.notInSessionDays).map((data) =>
-				Event.fromData(data!, this.api)
+				Event.fromData(data!, this.api._cachedInfo)
 			);
-			studentData.student = Student.fromData(data.student!, this.api);
+			studentData.student = Student.fromData(data.student!, this.api._cachedInfo);
 			studentData.yearID = data.yearId;
 			studentData.assignmentCategories = Object.values(assignmentCategories);
 			studentData.attendanceRecords = this.safelyParseUnpredictableArray(data.attendance).map((data) =>
-				AttendanceRecord.fromData(data!, this.api)
+				AttendanceRecord.fromData(data!, this.api._cachedInfo)
 			);
 			studentData.attendanceCodes = attendanceCodes;
 			studentData.finalGrades = finalGrades;
@@ -207,7 +189,7 @@ export default class User {
 		return parsed;
 	}
 
-	private safelyParseUnpredictableArray<T>(arr: T | T[]): T[] {
+	private safelyParseUnpredictableArray<T>(arr: T | T[]): NonNullable<T[]> {
 		if (!arr) return [];
 		if (Array.isArray(arr)) return arr;
 		return [arr];

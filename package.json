@@ -26,20 +26,23 @@
 	"license": "MIT",
 	"dependencies": {
 		"@types/request": "^2.48.7",
-		"node-fetch": "^3.0.0",
-		"readline-sync": "^1.4.10",
-		"request": "^2.88.2",
 		"soap": "0.39.0",
-		"source-map-support": "^0.5.20",
-		"tslib": "^2.3.1",
-		"typescript": "^4.4.4"
+		"source-map-support": "^0.5.20"
+	},
+	"peerDependencies": {
+		"tslib": ">=2.3.1"
 	},
 	"devDependencies": {
 		"@types/node": "^16.11.6",
+		"@types/sax": "^1.2.3",
 		"@types/source-map-support": "^0.5.4",
 		"husky": "^7.0.4",
 		"prettier": "^2.4.1",
-		"rimraf": "^3.0.2"
+		"readline-sync": "^1.4.10",
+		"rimraf": "^3.0.2",
+		"tslib": "^2.3.1",
+		"typedoc": "^0.22.9",
+		"typescript": "^4.5.2"
 	},
 	"prettier": {
 		"useTabs": true,

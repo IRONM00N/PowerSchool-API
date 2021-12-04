@@ -84,18 +84,18 @@ export default class StudentInfo {
 	 * @internal
 	 */
 	constructor() {
-		this.schools = null;
-		this.periods = null;
+		this.assignmentCategories = null;
+		this.attendanceCodes = null;
+		this.attendanceRecords = null;
 		this.courses = null;
-		this.terms = null;
-		this.reportingTerms = null;
+		this.finalGrades = null;
 		this.notInSessionDays = null;
+		this.periods = null;
+		this.reportingTerms = null;
+		this.schools = null;
 		this.student = null;
 		this.teachers = null;
+		this.terms = null;
 		this.yearID = null;
-		this.assignmentCategories = null;
-		this.attendanceRecords = null;
-		this.attendanceCodes = null;
-		this.finalGrades = null;
 	}
 }

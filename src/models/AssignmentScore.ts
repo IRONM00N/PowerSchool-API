@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from '..';
 import { AssignmentScoreVO } from "../types";
 import type Assignment from "./Assignment";
 
@@ -6,7 +6,7 @@ import type Assignment from "./Assignment";
  * The score received for a PowerSchool assignment.
  */
 export default class AssignmentScore {
-	private api: PowerSchoolAPI;
+	private _cache: CacheInfo;
 
 	/**
 	 * The ID of this assignment.
@@ -72,14 +72,14 @@ export default class AssignmentScore {
 	 * Get the assignment this score was received on.
 	 */
 	public get assignment(): Assignment {
-		return this.api._cachedInfo.assignments[this.assignmentID];
+		return this._cache.assignments[this.assignmentID];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		assignmentID: number,
 		collected: boolean,
@@ -93,34 +93,34 @@ export default class AssignmentScore {
 		percentage: number | null,
 		scoreType: number
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
+		this._cache = cache ?? null;
 		this.assignmentID = assignmentID ?? null;
 		this.collected = collected ?? null;
-		this.late = late ?? null;
-		this.missing = missing ?? null;
+		this.comment = comment ?? null;
 		this.exempt = exempt ?? null;
 		this.gradeBookType = gradeBookType ?? null;
-		this.comment = comment ?? null;
-		this.score = score ?? null;
-		this.percentage = percentage ?? null;
+		this.id = id ?? null;
+		this.late = late ?? null;
 		this.letterGrade = letterGrade ?? null;
+		this.missing = missing ?? null;
+		this.percentage = percentage ?? null;
+		this.score = score ?? null;
 		this.scoreType = scoreType ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	static fromData(data: AssignmentScoreVO, api: PowerSchoolAPI) {
+	static fromData(data: AssignmentScoreVO, cache: CacheInfo) {
 		// Calculate floating percentage from the odd string given
 		let percentage: number | null = Number.parseFloat(data.percent ?? "0");
 		if (Number.isNaN(percentage)) percentage = null;
 		if (percentage !== null) percentage /= 100;
 
 		return new AssignmentScore(
-			api,
-			data.id != null ? +data.id : null,
-			data.assignmentId != null ? +data.assignmentId : null,
+			cache,
+			data.id != null ? +data.id : null!,
+			data.assignmentId != null ? +data.assignmentId : null!,
 			data.collected,
 			data.late,
 			data.missing,
@@ -130,7 +130,7 @@ export default class AssignmentScore {
 			data.score,
 			data.letterGrade,
 			percentage != null ? +percentage : null,
-			data.scoretype != null ? +data.scoretype : null
+			data.scoretype != null ? +data.scoretype : null!
 		);
 	}
 }

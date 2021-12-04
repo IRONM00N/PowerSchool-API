@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import type { CacheInfo } from "..";
 import { DisabledFeaturesVO, SchoolVO } from "../types";
 import type AttendanceCode from "./AttendanceCode";
 
@@ -6,7 +6,7 @@ import type AttendanceCode from "./AttendanceCode";
  * A PowerSchool school information object.
  */
 export default class School {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The abbreviation for the school.
@@ -71,13 +71,18 @@ export default class School {
 	/**
 	 * Features that are disabled on the school (object with true or false, on disabled status of each key).
 	 */
-	public declare disabledFeatures: DisabledFeatures | null;
+	public declare disabledFeatures: DisabledFeatures;
+
+	/**
+	 * The id of the current term.
+	 */
+	public declare currentTermId: number | null;
 
 	/**
 	 * Get the attendance codes that belong to this school.
 	 */
 	public get attendanceCodes(): AttendanceCode[] {
-		return Object.values(this.api._cachedInfo.attendanceCodes).filter(
+		return Object.values(this._cache.attendanceCodes).filter(
 			(c: any) => c.schoolNumber == this.schoolNumber
 		) as AttendanceCode[];
 	}
@@ -86,7 +91,7 @@ export default class School {
 	 * @internal
 	 */
 	constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		name: string | null,
 		schoolNumber: number,
@@ -98,42 +103,48 @@ export default class School {
 		highGrade: number | null,
 		disabled: boolean,
 		disabledMessage: PowerSchoolDisabledMessage | null,
-		disabledFeatures: DisabledFeatures | null,
+		disabledFeatures: DisabledFeatures,
 		abbreviation: string | null,
 		currentTermId: number | null
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
-		this.name = name ?? null;
-		this.schoolNumber = schoolNumber ?? null;
-		this.formattedAddress = formattedAddress ?? null;
-		this.addressParts = addressParts ?? null;
-		this.phone = phone ?? null;
-		this.fax = fax ?? null;
-		this.lowGrade = lowGrade ?? null;
-		this.highGrade = highGrade ?? null;
-		this.disabled = disabled ?? null;
-		this.disabledMessage = disabledMessage ?? null;
-		this.disabledFeatures = disabledFeatures ?? null;
+		this._cache = cache ?? null;
 		this.abbreviation = abbreviation ?? null;
+		this.addressParts = addressParts ?? null;
+		this.currentTermId = currentTermId ?? null;
+		this.disabled = disabled ?? null;
+		this.disabledFeatures = disabledFeatures ?? null;
+		this.disabledMessage = disabledMessage ?? null;
+		this.fax = fax ?? null;
+		this.formattedAddress = formattedAddress ?? null;
+		this.highGrade = highGrade ?? null;
+		this.id = id ?? null;
+		this.lowGrade = lowGrade ?? null;
+		this.name = name ?? null;
+		this.phone = phone ?? null;
+		this.schoolNumber = schoolNumber ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	static fromData(data: SchoolVO, api: PowerSchoolAPI) {
+	static fromData(data: SchoolVO, cache: CacheInfo) {
+		const disabledFeatures = {} as DisabledFeaturesVO;
+		for (const [key, value] of Object.entries(data.disabledFeatures ?? {})) {
+			if (key !== "attributes") disabledFeatures[key as keyof DisabledFeaturesVO] = value;
+		}
+
 		return new School(
-			api,
-			data.schoolId != null ? +data.schoolId : null,
+			cache,
+			data.schoolId != null ? +data.schoolId : null!,
 			data.name,
-			data.schoolNumber != null ? +data.schoolNumber : null,
+			data.schoolNumber != null ? +data.schoolNumber : null!,
 			data.address,
 			{
-				streetAddress: data.schooladdress,
-				city: data.schoolcity,
-				state: data.schoolstate,
-				country: data.schoolcountry,
-				zip: data.schoolzip
+				streetAddress: data.schooladdress ?? null,
+				city: data.schoolcity ?? null,
+				state: data.schoolstate ?? null,
+				country: data.schoolcountry ?? null,
+				zip: data.schoolzip ?? null
 			},
 			data.schoolphone,
 			data.schoolfax,
@@ -143,7 +154,7 @@ export default class School {
 			data.schoolDisabledTitle || data.schoolDisabledMessage
 				? { title: data.schoolDisabledTitle, message: data.schoolDisabledMessage }
 				: null,
-			data.disabledFeatures,
+			disabledFeatures,
 			data.abbreviation,
 			data.currentTermId != null ? +data.currentTermId : null
 		);

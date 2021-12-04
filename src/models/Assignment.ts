@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import type { CacheInfo } from "..";
 import { AssignmentVO } from "../types";
 import type AssignmentCategory from "./AssignmentCategory";
 import type AssignmentScore from "./AssignmentScore";
@@ -8,7 +8,7 @@ import type Course from "./Course";
  * A PowerSchool assignment.
  */
 export default class Assignment {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The ID of this assignment.
@@ -102,28 +102,28 @@ export default class Assignment {
 	 * Get the score received on this assignment, if available.
 	 */
 	public get score(): AssignmentScore {
-		return this.api._cachedInfo.assignmentScores[this.id];
+		return this._cache.assignmentScores[this.id];
 	}
 
 	/**
 	 * Get the category this assignment belongs to.
 	 */
 	public get category(): AssignmentCategory {
-		return this.api._cachedInfo.assignmentCategories[this.categoryID];
+		return this._cache.assignmentCategories[this.categoryID];
 	}
 
 	/**
 	 * Get the course this assignment belongs to.
 	 */
 	public get course(): Course {
-		return this.api._cachedInfo.courses[this.courseID];
+		return this._cache.courses[this.courseID];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		assignmentID: number,
 		name: string | null,
@@ -143,51 +143,51 @@ export default class Assignment {
 		courseDcID: number,
 		type: number
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
-		this.assignmentID = assignmentID ?? null;
-		this.name = name ?? null;
+		this._cache = cache ?? null;
 		this.abbreviation = abbreviation ?? null;
+		this.assignmentID = assignmentID ?? null;
 		this.categoryID = categoryID ?? null;
+		this.courseDcID = courseDcID ?? null;
 		this.courseID = courseID ?? null;
 		this.description = description ?? null;
 		this.dueDate = dueDate ?? null;
 		this.gradeBookType = gradeBookType ?? null;
-		this.weight = weight ?? null;
+		this.id = id ?? null;
 		this.includeInFinalGrades = includeInFinalGrades ?? null;
-		this.publishScores = publishScores ?? null;
-		this.publishOnSpecificDate = publishOnSpecificDate ?? null;
+		this.name = name ?? null;
 		this.possiblePoints = possiblePoints ?? null;
 		this.publishDaysBeforeDue = publishDaysBeforeDue ?? null;
+		this.publishOnSpecificDate = publishOnSpecificDate ?? null;
+		this.publishScores = publishScores ?? null;
 		this.publishState = publishState ?? null;
-		this.courseDcID = courseDcID ?? null;
 		this.type = type ?? null;
+		this.weight = weight ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	public static fromData(data: AssignmentVO, api: PowerSchoolAPI) {
+	public static fromData(data: AssignmentVO, cache: CacheInfo) {
 		return new Assignment(
-			api,
-			data.id != null ? +data.id : null,
-			data.assignmentid != null ? +data.assignmentid : null,
+			cache,
+			data.id != null ? +data.id : null!,
+			data.assignmentid != null ? +data.assignmentid : null!,
 			data.name,
 			data.abbreviation,
-			data.categoryId != null ? +data.categoryId : null,
-			data.sectionid != null ? +data.sectionid : null,
+			data.categoryId != null ? +data.categoryId : null!,
+			data.sectionid != null ? +data.sectionid : null!,
 			data.description,
 			data.dueDate ? new Date(data.dueDate) : null,
-			data.gradeBookType != null ? +data.gradeBookType : null,
-			data.weight != null ? +data.weight : null,
+			data.gradeBookType != null ? +data.gradeBookType : null!,
+			data.weight != null ? +data.weight : null!,
 			data.includeinfinalgrades == 1,
 			data.publishscores == 1,
 			data.publishonspecificdate ? new Date(data.publishonspecificdate) : null,
-			data.pointspossible != null ? +data.pointspossible : null,
-			data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null,
-			data.publishState != null ? +data.publishState : null,
-			data.sectionDcid != null ? +data.sectionDcid : null,
-			data.type != null ? +data.type : null
+			data.pointspossible != null ? +data.pointspossible : null!,
+			data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null!,
+			data.publishState != null ? +data.publishState : null!,
+			data.sectionDcid != null ? +data.sectionDcid : null!,
+			data.type != null ? +data.type : null!
 		);
 	}
 }

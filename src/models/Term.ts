@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from '..';
 import { TermVO } from "../types";
 import type School from "./School";
 
@@ -6,7 +6,7 @@ import type School from "./School";
  * A PowerSchool term, for which courses can be a part of.
  */
 export default class Term {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The ID of this term.
@@ -36,7 +36,7 @@ export default class Term {
 	/**
 	 * The number of the school this term is from.
 	 */
-	public declare schoolNumber: string | null;
+	public declare schoolNumber: number | null;
 
 	/**
 	 * The abbreviated title of this term, for use in smaller spaces.
@@ -44,49 +44,57 @@ export default class Term {
 	public declare abbreviatedTitle: string | null;
 
 	/**
+	 * Whether or not this term is suppressed / hidden.
+	 */
+	public declare suppressed: boolean;
+
+	/**
 	 * Get the school this term is from.
 	 */
 	public get school(): School {
 		if (!this.schoolNumber) throw new Error("schoolNumber is null");
-		return this.api._cachedInfo.schools[this.schoolNumber];
+		return this._cache.schools[+this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		title: string | null,
 		startDate: Date | null,
 		endDate: Date | null,
 		parentTermID: number,
-		schoolNumber: string | null,
-		abbreviatedTitle: string | null = null
+		schoolNumber: number | null,
+		abbreviatedTitle: string | null,
+		suppressed: boolean
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
-		this.title = title ?? null;
-		this.startDate = startDate ?? null;
+		this._cache = cache ?? null;
+		this.abbreviatedTitle = abbreviatedTitle ?? null;
 		this.endDate = endDate ?? null;
+		this.id = id ?? null;
 		this.parentTermID = parentTermID ?? null;
 		this.schoolNumber = schoolNumber ?? null;
-		this.abbreviatedTitle = abbreviatedTitle ?? null;
+		this.startDate = startDate ?? null;
+		this.suppressed = suppressed ?? null;
+		this.title = title ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	static fromData(data: TermVO, api: PowerSchoolAPI) {
+	static fromData(data: TermVO, cache: CacheInfo) {
 		return new Term(
-			api,
-			data.id != null ? +data.id : null,
+			cache,
+			data.id != null ? +data.id : null!,
 			data.title,
 			data.startDate ? new Date(data.startDate) : null,
 			data.endDate ? new Date(data.endDate) : null,
-			data.parentTermId != null ? +data.parentTermId : null,
-			data.schoolNumber,
-			data.abbrev
+			data.parentTermId != null ? +data.parentTermId : null!,
+			data.schoolNumber != null ? +data.schoolNumber : null, // for some reason this is a string and not a number even though it is a number
+			data.abbrev,
+			data.suppressed
 		);
 	}
 }

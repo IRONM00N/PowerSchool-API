@@ -1,19 +1,18 @@
-import "source-map-support/register";
 import { createClient } from "soap";
-import User from "./models/User";
-import { PublicPortalServiceJSONClient } from "./types";
-import "request";
-import Teacher from "./models/Teacher";
-import Period from "./models/Period";
-import School from "./models/School";
-import Course from "./models/Course";
-import FinalGrade from "./models/FinalGrade";
-import Term from "./models/Term";
-import ReportingTerm from "./models/ReportingTerm";
+import "source-map-support/register";
 import Assignment from "./models/Assignment";
+import AssignmentCategory from "./models/AssignmentCategory";
 import AssignmentScore from "./models/AssignmentScore";
 import AttendanceCode from "./models/AttendanceCode";
-import AssignmentCategory from "./models/AssignmentCategory";
+import Course from "./models/Course";
+import FinalGrade from "./models/FinalGrade";
+import Period from "./models/Period";
+import ReportingTerm from "./models/ReportingTerm";
+import School from "./models/School";
+import Teacher from "./models/Teacher";
+import Term from "./models/Term";
+import User from "./models/User";
+import { PublicPortalServiceJSONClient } from "./types";
 
 /**
  * The main PowerSchool API wrapper, for logging into user accounts and caching of retrieved info.
@@ -25,7 +24,7 @@ export default class PowerSchoolAPI {
 	public declare ready: boolean;
 	public declare errored: boolean;
 	public declare requestOptions: { auth: { user: string; pass: string; sendImmediately: boolean } };
-	declare _cachedInfo: Cache;
+	declare _cachedInfo: CacheInfo;
 	public declare client: PublicPortalServiceJSONClient;
 
 	/**
@@ -41,7 +40,7 @@ export default class PowerSchoolAPI {
 		this.ready = false;
 		this.errored = false;
 		this.requestOptions = { auth: { user: apiUsername, pass: apiPassword, sendImmediately: false } };
-		this._cachedInfo = {} as Cache;
+		this._cachedInfo = {} as CacheInfo;
 	}
 
 	/**
@@ -101,12 +100,29 @@ export default class PowerSchoolAPI {
 		if (!this._cachedInfo[dataType]) this._cachedInfo[dataType] = {};
 		dataArray.forEach(
 			(item) =>
-				(this._cachedInfo[dataType][item[idKey as keyof ArrayTypeMap[T]] as unknown as keyof typeof Cache] = item)
+				(this._cachedInfo[dataType][
+					item[
+						idKey as Exclude<
+							| keyof typeof AssignmentCategory
+							| keyof typeof Assignment
+							| keyof typeof AssignmentScore
+							| keyof typeof AttendanceCode
+							| keyof typeof Course
+							| keyof typeof FinalGrade
+							| keyof typeof Period
+							| keyof typeof ReportingTerm
+							| keyof typeof School
+							| keyof typeof Teacher
+							| keyof typeof Term,
+							"prototype" | "fromData"
+						>
+					]
+				] = item)
 		);
 	}
 }
 
-type Cache = {
+export type CacheInfo = {
 	assignmentCategories: { [id: number]: AssignmentCategory };
 	assignments: { [id: number]: Assignment };
 	assignmentScores: { [assignmentID: number]: AssignmentScore };
@@ -120,6 +136,9 @@ type Cache = {
 	terms: { [id: number]: Term };
 };
 
+/**
+ * @internal
+ */
 type ArrayTypeMap = {
 	assignmentCategories: AssignmentCategory;
 	assignments: Assignment;
@@ -133,6 +152,10 @@ type ArrayTypeMap = {
 	teachers: Teacher;
 	terms: Term;
 };
+
+/**
+ * @internal
+ */
 type IdTypeMap = {
 	assignmentCategories: "id";
 	assignments: "id";

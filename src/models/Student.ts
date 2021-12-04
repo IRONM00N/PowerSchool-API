@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from "..";
 import { StudentVO } from "../types";
 import type ReportingTerm from "./ReportingTerm";
 
@@ -6,7 +6,7 @@ import type ReportingTerm from "./ReportingTerm";
  * A object meant for holding basic information about a student.
  */
 export default class Student {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The student's ID.
@@ -78,14 +78,14 @@ export default class Student {
 	 */
 	public get currentReportingTerm(): ReportingTerm {
 		// Why did they make this a title instead of ID?
-		return Object.values(this.api._cachedInfo.reportingTerms).find((term) => term.title == this.currentTerm);
+		return Object.values(this._cache.reportingTerms).find((term) => term.title == this.currentTerm)!;
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(
-		api: PowerSchoolAPI,
+		_cache: CacheInfo,
 		id: number,
 		firstName: string | null,
 		middleName: string | null,
@@ -100,41 +100,41 @@ export default class Student {
 		currentMealBalance = 0,
 		startingMealBalance = 0
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
-		this.firstName = firstName ?? null;
-		this.middleName = middleName ?? null;
-		this.lastName = lastName ?? null;
+		this._cache = _cache ?? null;
+		this.currentGPA = currentGPA ?? null;
+		this.currentMealBalance = currentMealBalance ?? null;
+		this.currentTerm = currentTerm ?? null;
 		this.dateOfBirth = dateOfBirth ?? null;
 		this.ethnicity = ethnicity ?? null;
+		this.firstName = firstName ?? null;
 		this.gender = gender ?? null;
 		this.gradeLevel = gradeLevel ?? null;
-		this.currentGPA = currentGPA ?? null;
-		this.currentTerm = currentTerm ?? null;
+		this.id = id ?? null;
+		this.lastName = lastName ?? null;
+		this.middleName = middleName ?? null;
 		this.photoDate = photoDate ?? null;
-		this.currentMealBalance = currentMealBalance ?? null;
 		this.startingMealBalance = startingMealBalance ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	static fromData(data: StudentVO, api: PowerSchoolAPI) {
+	static fromData(data: StudentVO, _cache: CacheInfo) {
 		return new Student(
-			api,
-			data.id != null ? +data.id : null,
+			_cache,
+			data.id != null ? +data.id : null!,
 			data.firstName,
 			data.middleName,
 			data.lastName,
 			data.dob ? new Date(data.dob) : null,
 			data.ethnicity,
 			data.gender,
-			data.gradeLevel != null ? +data.gradeLevel : null,
+			data.gradeLevel != null ? +data.gradeLevel : null!,
 			data.currentGPA || null,
 			data.currentTerm,
 			data.photoDate ? new Date(data.photoDate) : null,
-			data.currentMealBalance != null ? +data.currentMealBalance : null,
-			data.startingMealBalance != null ? +data.startingMealBalance : null
+			data.currentMealBalance != null ? +data.currentMealBalance : null!,
+			data.startingMealBalance != null ? +data.startingMealBalance : null!
 		);
 	}
 

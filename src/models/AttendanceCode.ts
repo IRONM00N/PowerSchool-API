@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from '..';
 import { AttendanceCodeVO } from "../types";
 import type School from "./School";
 
@@ -6,7 +6,7 @@ import type School from "./School";
  * A code assigned to a PowerSchool attendance record.
  */
 export default class AttendanceCode {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The ID of this attendance code.
@@ -47,14 +47,14 @@ export default class AttendanceCode {
 	 * Get the school this code belongs to.
 	 */
 	public get school(): School {
-		return this.api._cachedInfo.schools[this.schoolNumber];
+		return this._cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		id: number,
 		code: string | null,
 		description: string | null,
@@ -63,27 +63,27 @@ export default class AttendanceCode {
 		sortOrder: number | null,
 		yearID: number | null
 	) {
-		this.api = api ?? null;
-		this.id = id ?? null;
+		this._cache = cache ?? null;
 		this.code = code ?? null;
 		this.description = description ?? null;
-		this.type = type ?? null;
+		this.id = id ?? null;
 		this.schoolNumber = schoolNumber ?? null;
 		this.sortOrder = sortOrder ?? null;
+		this.type = type ?? null;
 		this.yearID = yearID ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
-	public static fromData(data: AttendanceCodeVO, api: PowerSchoolAPI) {
+	public static fromData(data: AttendanceCodeVO, cache: CacheInfo) {
 		return new AttendanceCode(
-			api,
-			data.id != null ? +data.id : null,
+			cache,
+			data.id != null ? +data.id : null!,
 			data.attCode,
 			data.description,
 			data.codeType != null ? +data.codeType : null,
-			data.schoolid != null ? +data.schoolid : null,
+			data.schoolid != null ? +data.schoolid : null!,
 			data.sortorder != null ? +data.sortorder : null,
 			data.yearid != null ? +data.yearid : null
 		);

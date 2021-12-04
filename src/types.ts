@@ -1,5 +1,5 @@
-import { Client } from "soap";
 import { CoreOptions } from "request";
+import { Client } from "soap";
 
 type Cb<T> = (error: Error, result: T, rawResponse: unknown, soapHeader: unknown, rawRequest: unknown) => any;
 type Options = CoreOptions;

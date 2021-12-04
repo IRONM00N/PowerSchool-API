@@ -1,4 +1,4 @@
-import type PowerSchoolAPI from "..";
+import { CacheInfo } from '..';
 import { PeriodVO } from "../types";
 import type School from "./School";
 
@@ -6,7 +6,7 @@ import type School from "./School";
  * A PowerSchool period.
  */
 export default class Period {
-	private declare api: PowerSchoolAPI;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The abbreviation of this period.
@@ -47,14 +47,14 @@ export default class Period {
 	 * Get the school this period is from.
 	 */
 	public get school(): School {
-		return this.api._cachedInfo.schools[this.schoolID];
+		return this._cache.schools[this.schoolID];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(
-		api: PowerSchoolAPI,
+		cache: CacheInfo,
 		abbreviation: string | null,
 		id: number,
 		name: string | null,
@@ -63,7 +63,7 @@ export default class Period {
 		sortOrder: number,
 		yearID: number
 	) {
-		this.api = api ?? null;
+		this._cache = cache ?? null;
 		this.abbreviation = abbreviation ?? null;
 		this.id = id ?? null;
 		this.name = name ?? null;
@@ -76,16 +76,16 @@ export default class Period {
 	/**
 	 * @internal
 	 */
-	public static fromData(data: PeriodVO, api: PowerSchoolAPI) {
+	public static fromData(data: PeriodVO, cache: CacheInfo) {
 		return new Period(
-			api,
+			cache,
 			data.abbreviation,
-			data.id != null ? +data.id : null,
+			data.id != null ? +data.id : null!,
 			data.name,
-			data.periodNumber != null ? +data.periodNumber : null,
-			data.schoolid != null ? +data.schoolid : null,
-			data.sortOrder != null ? +data.sortOrder : null,
-			data.yearid != null ? +data.yearid : null
+			data.periodNumber != null ? +data.periodNumber : null!,
+			data.schoolid != null ? +data.schoolid : null!,
+			data.sortOrder != null ? +data.sortOrder : null!,
+			data.yearid != null ? +data.yearid : null!
 		);
 	}
 }

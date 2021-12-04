@@ -9,7 +9,7 @@
 		"noErrorTruncation": true,
 		"useUnknownInCatchVariables": false,
 		"alwaysStrict": true,
-		"strict": false,
+		"strict": true,
 		"noImplicitOverride": true,
 		"declarationMap": true,
 		"declaration": true,

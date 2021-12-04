@@ -39,10 +39,10 @@ export default class Teacher {
 		email: string | null,
 		schoolPhone: string | null
 	) {
-		this.id = id ?? null;
-		this.firstName = firstName ?? null;
-		this.lastName = lastName ?? null;
 		this.email = email ?? null;
+		this.firstName = firstName ?? null;
+		this.id = id ?? null;
+		this.lastName = lastName ?? null;
 		this.schoolPhone = schoolPhone ?? null;
 	}
 
@@ -50,7 +50,7 @@ export default class Teacher {
 	 * @internal
 	 */
 	static fromData(data: TeacherVO) {
-		return new Teacher(data.id != null ? +data.id : null, data.firstName, data.lastName, data.email, data.schoolPhone);
+		return new Teacher(data.id != null ? +data.id : null!, data.firstName, data.lastName, data.email, data.schoolPhone);
 	}
 
 	/**
