@@ -1,5 +1,5 @@
-import { CacheInfo } from '..';
-import { SectionVO } from "../types";
+import { CacheInfo } from "..";
+import { SectionVO, StartStopDateVO } from "../types";
 import type Assignment from "./Assignment";
 import type FinalGrade from "./FinalGrade";
 import type School from "./School";
@@ -10,17 +10,10 @@ import type Term from "./Term";
  * A PowerSchool course.
  */
 export default class Course {
+	/**
+	 * The API cache.
+	 */
 	private declare _cache: CacheInfo;
-
-	/**
-	 * The ID of this course.
-	 */
-	public declare id: number;
-
-	/**
-	 * The title of this course.
-	 */
-	public declare title: string | null;
 
 	/**
 	 * The code of this course.
@@ -28,34 +21,19 @@ export default class Course {
 	public declare code: string | null;
 
 	/**
-	 * The number of the school this course is from.
+	 * The DCID of this course.
 	 */
-	public declare schoolNumber: number;
+	public declare DCID: number;
 
 	/**
-	 * The ID of the term this course is a part of.
+	 * The description text of this course.
 	 */
-	public declare termID: number;
+	public declare description: string | null;
 
 	/**
-	 * A number to use to sort this period among others.
+	 * The enrollments of this course.
 	 */
-	public declare periodSort: number | null;
-
-	/**
-	 * The name of the room this course takes place in.
-	 */
-	public declare roomName: string | null;
-
-	/**
-	 * The number of the section this course is in.
-	 */
-	public declare sectionNumber: string | null;
-
-	/**
-	 * The ID of the teacher teaching this course.
-	 */
-	public declare teacherID: number;
+	public declare enrollments: CourseEnrollment[] | null;
 
 	/**
 	 * An expression to use to sort this course's period among others.
@@ -68,9 +46,72 @@ export default class Course {
 	public declare gradeBookType: number;
 
 	/**
-	 * The description text of this course.
+	 * The ID of this course.
 	 */
-	public declare description: string | null;
+	public declare id: number;
+
+	/**
+	 * A number to use to sort this period among others.
+	 */
+	public declare periodSort: number | null;
+
+	/**
+	 * The name of the room this course takes place in.
+	 */
+	public declare roomName: string | null;
+
+	/**
+	 * The number of the school this course is from.
+	 */
+	public declare schoolNumber: number;
+
+	/**
+	 * The number of the section this course is in.
+	 */
+	public declare sectionNumber: string | null;
+
+	/**
+	 * The start and stop dates of this course
+	 */
+	public declare startStopDates: StartStopDates[] | null;
+
+	/**
+	 * The ID of the teacher teaching this course.
+	 */
+	public declare teacherID: number;
+
+	/**
+	 * The ID of the term this course is a part of.
+	 */
+	public declare termID: number;
+
+	/**
+	 * The title of this course.
+	 */
+	public declare title: string | null;
+
+	/**
+	 * Get any assignments associated with this course.
+	 *
+	 * **NOTE:** This getter filters through all assignments every time it is called, so use it sparingly.
+	 */
+	public get assignments(): Assignment[] {
+		return Object.values(this._cache.assignments).filter((a: any) => a.courseID == this.id) as Assignment[];
+	}
+
+	/**
+	 * Get the final grade received in this course, if available.
+	 */
+	public get finalGrade(): FinalGrade {
+		return this._cache.finalGrades[this.id];
+	}
+
+	/**
+	 * Get the teacher teaching this course.
+	 */
+	public get teacher(): Teacher {
+		return this._cache.teachers[this.teacherID];
+	}
 
 	/**
 	 * Get the term this course is a part of.
@@ -87,79 +128,90 @@ export default class Course {
 	}
 
 	/**
-	 * Get the teacher teaching this course.
-	 */
-	public get teacher(): Teacher {
-		return this._cache.teachers[this.teacherID];
-	}
-
-	/**
-	 * Get the final grade received in this course, if available.
-	 */
-	public get finalGrade(): FinalGrade {
-		return this._cache.finalGrades[this.id];
-	}
-
-	/**
-	 * Get any assignments associated with this course.
-	 *
-	 * **NOTE:** This getter filters through all assignments every time it is called, so use it sparingly.
-	 */
-	public get assignments(): Assignment[] {
-		return Object.values(this._cache.assignments).filter((a: any) => a.courseID == this.id) as Assignment[];
-	}
-
-	/**
 	 * @internal
 	 */
-	public constructor(
-		api: CacheInfo,
-		id: number,
-		title: string | null,
-		code: string | null,
-		schoolNumber: number,
-		termID: number,
-		periodSort: number | null,
-		roomName: string | null,
-		sectionNumber: string | null,
-		teacherID: number,
-		expression: string | null,
-		gradeBookType: number,
-		description: string | null = null
-	) {
+	public constructor(api: CacheInfo, data: CourseData) {
 		this._cache = api ?? null;
-		this.code = code ?? null;
-		this.description = description ?? null;
-		this.expression = expression ?? null;
-		this.gradeBookType = gradeBookType ?? null;
-		this.id = id ?? null;
-		this.periodSort = periodSort ?? null;
-		this.roomName = roomName ?? null;
-		this.schoolNumber = schoolNumber ?? null;
-		this.sectionNumber = sectionNumber ?? null;
-		this.teacherID = teacherID ?? null;
-		this.termID = termID ?? null;
-		this.title = title ?? null;
+		this.code = data.code ?? null;
+		this.DCID = data.DCID ?? null;
+		this.description = data.description ?? null;
+		this.enrollments = data.enrollments ?? null;
+		this.expression = data.expression ?? null;
+		this.gradeBookType = data.gradeBookType ?? null;
+		this.id = data.id ?? null;
+		this.periodSort = data.periodSort ?? null;
+		this.roomName = data.roomName ?? null;
+		this.schoolNumber = data.schoolNumber ?? null;
+		this.sectionNumber = data.sectionNumber ?? null;
+		this.startStopDates = data.startStopDates ?? null;
+		this.teacherID = data.teacherID ?? null;
+		this.termID = data.termID ?? null;
+		this.title = data.title ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: SectionVO, api: CacheInfo) {
-		return new Course(
-			api,
-			data.id != null ? +data.id : null!,
-			data.schoolCourseTitle,
-			data.courseCode,
-			data.schoolNumber != null ? +data.schoolNumber : null!,
-			data.termID != null ? +data.termID : null!,
-			data.periodSort != null ? +data.periodSort : null,
-			data.roomName,
-			data.sectionNum,
-			data.teacherID != null ? +data.teacherID : null!,
-			data.expression,
-			data.gradeBookType != null ? +data.gradeBookType : null!,
-			data.description
-		);
+		return new Course(api, {
+			code: data.courseCode,
+			DCID: data.dcid != null ? +data.dcid : null!,
+			description: data.description,
+			enrollments: parseObjArr(data.enrollments, ["id"]),
+			expression: data.expression,
+			gradeBookType: data.gradeBookType != null ? +data.gradeBookType : null!,
+			id: data.id != null ? +data.id : null!,
+			periodSort: data.periodSort != null ? +data.periodSort : null,
+			roomName: data.roomName,
+			schoolNumber: data.schoolNumber != null ? +data.schoolNumber : null!,
+			sectionNumber: data.sectionNum,
+			startStopDates: parseObjArr(data.startStopDates, ["sectionEnrollmentId"]),
+			teacherID: data.teacherID != null ? +data.teacherID : null!,
+			termID: data.termID != null ? +data.termID : null!,
+			title: data.schoolCourseTitle,
+		});
 	}
+}
+
+export interface CourseData {
+	code: string | null;
+	DCID: number;
+	description: string | null;
+	enrollments: CourseEnrollment[] | null;
+	expression: string | null;
+	gradeBookType: number;
+	id: number;
+	periodSort: number | null;
+	roomName: string | null;
+	schoolNumber: number;
+	sectionNumber: string | null;
+	startStopDates: StartStopDateVO[] | null;
+	teacherID: number;
+	termID: number;
+	title: string | null;
+}
+
+function parseObjArr<T>(data: T | T[], keyToNum: string[] = []): T extends null ? never : T[] {
+	if (!data) return [] as unknown as T extends null ? never : T[];
+	const array = Array.isArray(data) ? [...data] : [{ ...data }];
+	for (const element of array) {
+		if ("attributes" in element) delete (element as any)["attributes"];
+		for (const key of keyToNum) {
+			if (key in element) (element as any)[key] = (element as any)[key] != null ? +(element as any)[key] : null;
+		}
+	}
+	return array as unknown as T extends null ? never : T[];
+}
+
+export interface CourseEnrollment {
+	endDate: Date | null;
+	enrollStatus: number;
+	id: number;
+	startDate: Date | null;
+}
+
+export interface StartStopDates {
+	sectionEnrollmentId: number;
+	start: Date | null;
+	stop: Date | null;
 }

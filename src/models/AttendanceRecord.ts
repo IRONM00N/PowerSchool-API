@@ -1,4 +1,4 @@
-import { CacheInfo } from '..';
+import { CacheInfo } from "..";
 import { AttendanceVO } from "../types";
 import type AttendanceCode from "./AttendanceCode";
 import type Period from "./Period";
@@ -8,12 +8,10 @@ import type School from "./School";
  * A PowerSchool attendance record, such as a deviation from normal attendance.
  */
 export default class AttendanceRecord {
-	private declare _cache: CacheInfo;
-
 	/**
-	 * The ID of this attendance code.
+	 * The API cache.
 	 */
-	public declare id: number;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The identifier for this attendance record's code.
@@ -31,14 +29,19 @@ export default class AttendanceRecord {
 	public declare date: Date | null;
 
 	/**
-	 * The number of the school this record was created by.
+	 * The ID of this attendance code.
 	 */
-	public declare schoolNumber: number;
+	public declare id: number;
 
 	/**
 	 * The identifier of the period this record covers.
 	 */
 	public declare periodID: number;
+
+	/**
+	 * The number of the school this record was created by.
+	 */
+	public declare schoolNumber: number;
 
 	/**
 	 * The identifier of the student this record involves.
@@ -51,10 +54,10 @@ export default class AttendanceRecord {
 	public declare totalMinutes: number;
 
 	/**
-	 * Get the school this record belongs to.
+	 * Get the code of this record.
 	 */
-	public get school(): School {
-		return this._cache.schools[this.schoolNumber];
+	public get code(): AttendanceCode {
+		return this._cache.attendanceCodes[this.codeID];
 	}
 
 	/**
@@ -65,51 +68,51 @@ export default class AttendanceRecord {
 	}
 
 	/**
-	 * Get the code of this record.
+	 * Get the school this record belongs to.
 	 */
-	public get code(): AttendanceCode {
-		return this._cache.attendanceCodes[this.codeID];
+	public get school(): School {
+		return this._cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
-	public constructor(
-		cache: CacheInfo,
-		id: number,
-		codeID: number,
-		comment: string | null,
-		date: Date | null,
-		schoolNumber: number,
-		periodID: number,
-		studentID: number,
-		totalMinutes: number
-	) {
+	public constructor(cache: CacheInfo, data: AttendanceRecordData) {
 		this._cache = cache ?? null;
-		this.codeID = codeID ?? null;
-		this.comment = comment ?? null;
-		this.date = date ?? null;
-		this.id = id ?? null;
-		this.periodID = periodID ?? null;
-		this.schoolNumber = schoolNumber ?? null;
-		this.studentID = studentID ?? null;
-		this.totalMinutes = totalMinutes ?? null;
+		this.codeID = data.codeID ?? null;
+		this.comment = data.comment ?? null;
+		this.date = data.date ?? null;
+		this.id = data.id ?? null;
+		this.periodID = data.periodID ?? null;
+		this.schoolNumber = data.schoolNumber ?? null;
+		this.studentID = data.studentID ?? null;
+		this.totalMinutes = data.totalMinutes ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: AttendanceVO, cache: CacheInfo) {
-		return new AttendanceRecord(
-			cache,
-			data.id != null ? +data.id : null!,
-			data.attCodeid != null ? +data.attCodeid : null!,
-			data.attComment,
-			data.attDate ? new Date(data.attDate) : null,
-			data.schoolid != null ? +data.schoolid : null!,
-			data.periodid != null ? +data.periodid : null!,
-			data.studentid != null ? +data.studentid : null!,
-			data.totalMinutes != null ? +data.totalMinutes : null!
-		);
+		return new AttendanceRecord(cache, {
+			id: data.id != null ? +data.id : null!,
+			codeID: data.attCodeid != null ? +data.attCodeid : null!,
+			comment: data.attComment,
+			date: data.attDate ? new Date(data.attDate) : null,
+			schoolNumber: data.schoolid != null ? +data.schoolid : null!,
+			periodID: data.periodid != null ? +data.periodid : null!,
+			studentID: data.studentid != null ? +data.studentid : null!,
+			totalMinutes: data.totalMinutes != null ? +data.totalMinutes : null!,
+		});
 	}
+}
+
+export interface AttendanceRecordData {
+	codeID: number;
+	comment: string | null;
+	date: Date | null;
+	id: number;
+	periodID: number;
+	schoolNumber: number;
+	studentID: number;
+	totalMinutes: number;
 }

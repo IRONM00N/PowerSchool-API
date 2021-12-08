@@ -8,22 +8,10 @@ import type Course from "./Course";
  * A PowerSchool assignment.
  */
 export default class Assignment {
+	/**
+	 * The API cache.
+	 */
 	private declare _cache: CacheInfo;
-
-	/**
-	 * The ID of this assignment.
-	 */
-	public declare id: number;
-
-	/**
-	 * The secondary ID of this assignment in the system.
-	 */
-	public declare assignmentID: number;
-
-	/**
-	 * The name of this assignment.
-	 */
-	public declare name: string | null;
 
 	/**
 	 * A shorter name for this assignment.
@@ -31,9 +19,19 @@ export default class Assignment {
 	public declare abbreviation: string | null;
 
 	/**
+	 * The secondary ID of this assignment in the system.
+	 */
+	public declare assignmentID: number;
+
+	/**
 	 * The category this assignment belongs to.
 	 */
 	public declare categoryID: number;
+
+	/**
+	 * The DCID of the category this assignment belongs to.
+	 */
+	public declare courseDCID: number;
 
 	/**
 	 * The course this assignment belongs to.
@@ -56,9 +54,9 @@ export default class Assignment {
 	public declare gradeBookType: number;
 
 	/**
-	 * The weight this assignment carries on the overall course mark.
+	 * The ID of this assignment.
 	 */
-	public declare weight: number;
+	public declare id: number;
 
 	/**
 	 * Whether or not this assignment's mark will influence the final grade in this course.
@@ -66,14 +64,9 @@ export default class Assignment {
 	public declare includeInFinalGrades: boolean;
 
 	/**
-	 * Whether scores for this assignment will be published or not.
+	 * The name of this assignment.
 	 */
-	public declare publishScores: boolean;
-
-	/**
-	 * The specific date scores for this assignment will be published, if available.
-	 */
-	public declare publishOnSpecificDate: Date | null;
+	public declare name: string | null;
 
 	/**
 	 * The maximum number of points one can receive for this assignment.
@@ -86,17 +79,29 @@ export default class Assignment {
 	public declare publishDaysBeforeDue: number;
 
 	/**
+	 * The specific date scores for this assignment will be published, if available.
+	 */
+	public declare publishOnSpecificDate: Date | null;
+
+	/**
+	 * Whether scores for this assignment will be published or not.
+	 */
+	public declare publishScores: boolean;
+
+	/**
 	 * If the assignment is published
 	 */
 	public declare publishState: number;
-
-	//todo: what is this
-	public declare courseDcID: number;
 
 	/**
 	 * The type of this assignment.
 	 */
 	public declare type: number;
+
+	/**
+	 * The weight this assignment carries on the overall course mark.
+	 */
+	public declare weight: number;
 
 	/**
 	 * Get the score received on this assignment, if available.
@@ -122,72 +127,72 @@ export default class Assignment {
 	/**
 	 * @internal
 	 */
-	public constructor(
-		cache: CacheInfo,
-		id: number,
-		assignmentID: number,
-		name: string | null,
-		abbreviation: string | null,
-		categoryID: number,
-		courseID: number,
-		description: string | null,
-		dueDate: Date | null,
-		gradeBookType: number,
-		weight: number,
-		includeInFinalGrades: boolean,
-		publishScores: boolean,
-		publishOnSpecificDate: Date | null,
-		possiblePoints: number,
-		publishDaysBeforeDue: number,
-		publishState: number,
-		courseDcID: number,
-		type: number
-	) {
+	public constructor(cache: CacheInfo, data: AssignmentData) {
 		this._cache = cache ?? null;
-		this.abbreviation = abbreviation ?? null;
-		this.assignmentID = assignmentID ?? null;
-		this.categoryID = categoryID ?? null;
-		this.courseDcID = courseDcID ?? null;
-		this.courseID = courseID ?? null;
-		this.description = description ?? null;
-		this.dueDate = dueDate ?? null;
-		this.gradeBookType = gradeBookType ?? null;
-		this.id = id ?? null;
-		this.includeInFinalGrades = includeInFinalGrades ?? null;
-		this.name = name ?? null;
-		this.possiblePoints = possiblePoints ?? null;
-		this.publishDaysBeforeDue = publishDaysBeforeDue ?? null;
-		this.publishOnSpecificDate = publishOnSpecificDate ?? null;
-		this.publishScores = publishScores ?? null;
-		this.publishState = publishState ?? null;
-		this.type = type ?? null;
-		this.weight = weight ?? null;
+		this.abbreviation = data.abbreviation ?? null;
+		this.assignmentID = data.assignmentID ?? null;
+		this.categoryID = data.categoryID ?? null;
+		this.courseDCID = data.courseDCID ?? null;
+		this.courseID = data.courseID ?? null;
+		this.description = data.description ?? null;
+		this.dueDate = data.dueDate ?? null;
+		this.gradeBookType = data.gradeBookType ?? null;
+		this.id = data.id ?? null;
+		this.includeInFinalGrades = data.includeInFinalGrades ?? null;
+		this.name = data.name ?? null;
+		this.possiblePoints = data.possiblePoints ?? null;
+		this.publishDaysBeforeDue = data.publishDaysBeforeDue ?? null;
+		this.publishOnSpecificDate = data.publishOnSpecificDate ?? null;
+		this.publishScores = data.publishScores ?? null;
+		this.publishState = data.publishState ?? null;
+		this.type = data.type ?? null;
+		this.weight = data.weight ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: AssignmentVO, cache: CacheInfo) {
-		return new Assignment(
-			cache,
-			data.id != null ? +data.id : null!,
-			data.assignmentid != null ? +data.assignmentid : null!,
-			data.name,
-			data.abbreviation,
-			data.categoryId != null ? +data.categoryId : null!,
-			data.sectionid != null ? +data.sectionid : null!,
-			data.description,
-			data.dueDate ? new Date(data.dueDate) : null,
-			data.gradeBookType != null ? +data.gradeBookType : null!,
-			data.weight != null ? +data.weight : null!,
-			data.includeinfinalgrades == 1,
-			data.publishscores == 1,
-			data.publishonspecificdate ? new Date(data.publishonspecificdate) : null,
-			data.pointspossible != null ? +data.pointspossible : null!,
-			data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null!,
-			data.publishState != null ? +data.publishState : null!,
-			data.sectionDcid != null ? +data.sectionDcid : null!,
-			data.type != null ? +data.type : null!
-		);
+		return new Assignment(cache, {
+			abbreviation: data.abbreviation,
+			assignmentID: data.assignmentid != null ? +data.assignmentid : null!,
+			categoryID: data.categoryId != null ? +data.categoryId : null!,
+			courseDCID: data.sectionDcid != null ? +data.sectionDcid : null!,
+			courseID: data.sectionid != null ? +data.sectionid : null!,
+			description: data.description,
+			dueDate: data.dueDate ? new Date(data.dueDate) : null,
+			gradeBookType: data.gradeBookType != null ? +data.gradeBookType : null!,
+			id: data.id != null ? +data.id : null!,
+			includeInFinalGrades: data.includeinfinalgrades == 1,
+			name: data.name,
+			possiblePoints: data.pointspossible != null ? +data.pointspossible : null!,
+			publishDaysBeforeDue: data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null!,
+			publishOnSpecificDate: data.publishonspecificdate ? new Date(data.publishonspecificdate) : null,
+			publishScores: data.publishscores == 1,
+			publishState: data.publishState != null ? +data.publishState : null!,
+			type: data.type != null ? +data.type : null!,
+			weight: data.weight != null ? +data.weight : null!,
+		});
 	}
+}
+
+export interface AssignmentData {
+	abbreviation: string | null;
+	assignmentID: number;
+	categoryID: number;
+	courseDCID: number;
+	courseID: number;
+	description: string | null;
+	dueDate: Date | null;
+	gradeBookType: number;
+	id: number;
+	includeInFinalGrades: boolean;
+	name: string | null;
+	possiblePoints: number;
+	publishDaysBeforeDue: number;
+	publishOnSpecificDate: Date | null;
+	publishScores: boolean;
+	publishState: number;
+	type: number;
+	weight: number;
 }

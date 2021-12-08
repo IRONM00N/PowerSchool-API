@@ -18,14 +18,45 @@ import { PublicPortalServiceJSONClient } from "./types";
  * The main PowerSchool API wrapper, for logging into user accounts and caching of retrieved info.
  */
 export default class PowerSchoolAPI {
-	public declare url: string;
-	public declare apiUsername: string;
-	public declare apiPassword: string;
-	public declare ready: boolean;
-	public declare errored: boolean;
-	public declare requestOptions: { auth: { user: string; pass: string; sendImmediately: boolean } };
+	/**
+	 * Cached user data.
+	 */
 	declare _cachedInfo: CacheInfo;
+
+	/**
+	 * The password used to connect to the PowerSchool API.
+	 */
+	public declare apiPassword: string;
+
+	/**
+	 * The username used to connect to the PowerSchool API.
+	 */
+	public declare apiUsername: string;
+
+	/**
+	 * The client used to connect to the PowerSchool API.
+	 */
 	public declare client: PublicPortalServiceJSONClient;
+
+	/**
+	 * Whether or not the client has errored.
+	 */
+	public declare errored: boolean;
+
+	/**
+	 * Whether or not the client is ready to use.
+	 */
+	public declare ready: boolean;
+
+	/**
+	 * The options used to connect to the PowerSchool API.
+	 */
+	public declare requestOptions: { auth: { user: string; pass: string; sendImmediately: boolean } };
+
+	/**
+	 * The url used to connect to the PowerSchool API.
+	 */
+	public declare url: string;
 
 	/**
 	 * Create an API wrapper.
@@ -53,7 +84,7 @@ export default class PowerSchoolAPI {
 			createClient(
 				publicPortalServiceURL + "?wsdl",
 				{
-					request: require("request").defaults(this.requestOptions)
+					wsdl_options: this.requestOptions,
 				},
 				(err, client) => {
 					if (!client) {
@@ -93,6 +124,7 @@ export default class PowerSchoolAPI {
 	}
 
 	/**
+	 * Store a piece of information in the cache.
 	 * @internal
 	 */
 	public storeCacheInfo<T extends keyof ArrayTypeMap>(dataArray: ArrayTypeMap[T][], dataType: T, idKey: IdTypeMap[T]) {
@@ -122,6 +154,9 @@ export default class PowerSchoolAPI {
 	}
 }
 
+/**
+ * Cached user data.
+ */
 export type CacheInfo = {
 	assignmentCategories: { [id: number]: AssignmentCategory };
 	assignments: { [id: number]: Assignment };

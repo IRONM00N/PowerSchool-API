@@ -5,6 +5,7 @@ type Cb<T> = (error: Error, result: T, rawResponse: unknown, soapHeader: unknown
 type Options = CoreOptions;
 type base64Binary = string;
 type int = number;
+// type long = string; // node-soap makes longs a string
 type long = number;
 type double = number;
 type decimal = number;

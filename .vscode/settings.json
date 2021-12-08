@@ -11,7 +11,7 @@
 		"**/dist/**/*.ts.map": true
 	},
 	"editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.format": true
-  },
+		"source.organizeImports": true,
+		"source.format": true
+	}
 }

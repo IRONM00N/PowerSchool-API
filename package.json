@@ -46,7 +46,7 @@
 	},
 	"prettier": {
 		"useTabs": true,
-		"trailingComma": "none",
+		"trailingComma": "es5",
 		"arrowParens": "always",
 		"printWidth": 120
 	}

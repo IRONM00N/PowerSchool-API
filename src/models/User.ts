@@ -15,33 +15,49 @@ import Student from "./Student";
 import StudentInfo from "./StudentInfo";
 import Teacher from "./Teacher";
 import Term from "./Term";
+import UserSession from "./UserSession";
 
 /**
  * A PowerSchool API user, which holds information about the user and methods to interact with them.
  */
 export default class User {
-	declare api: PowerSchoolAPI;
-	declare session: UserSessionVO;
-	declare userID: number;
-	declare userType: number;
-	declare studentData: StudentInfo[];
-	declare rawResult: getStudentDataResponse | null;
+	/**
+	 * The PowerSchool API.
+	 */
+	public declare api: PowerSchoolAPI;
+
+	/**
+	 * The raw response of the `getStudentData` API call.
+	 */
+	public declare rawResult: getStudentDataResponse | null;
+
+	/**
+	 * The user's session.
+	 */
+	public declare session: UserSession;
+
+	/**
+	 * Cached student data. Only populated if {@link getStudentsInfo} is called.
+	 */
+	public declare studentData: StudentInfo[];
+
+	/**
+	 * The user's ID.
+	 */
+	public declare userID: number;
+
+	/**
+	 * The user's type.
+	 */
+	public declare userType: number;
 
 	/**
 	 * @internal
 	 */
-	constructor(session: UserSessionVO, api: PowerSchoolAPI) {
-		this.session = session ?? null;
-		if (this.session.serverCurrentTime) {
-			// For some reason it provides it in a different format than it provides (wants ISO 8601)
-			this.session.serverCurrentTime = new Date(this.session.serverCurrentTime).toISOString();
-		}
+	constructor(sessionData: UserSessionVO, api: PowerSchoolAPI) {
+		this.session = sessionData != null ? UserSession.fromData(sessionData) : null!;
 		this.api = api ?? null;
-		this._initUserVariables();
-	}
-
-	private _initUserVariables() {
-		this.userID = this.session.userId ?? null;
+		this.userID = this.session.userID ?? null;
 		this.userType = this.session.userType ?? null;
 		// We need to fetch these separately
 		this.studentData = [];
@@ -59,15 +75,17 @@ export default class User {
 					userId: this.userID,
 					serviceTicket: this.session.serviceTicket,
 					serverInfo: {
-						apiVersion: this.session.serverInfo!.apiVersion
+						apiVersion: this.session.serverInfo!.apiVersion,
 					},
-					serverCurrentTime: this.session.serverCurrentTime,
-					userType: this.userType
+					// For some reason it provides it in a different format than it provides (wants ISO 8601)
+					serverCurrentTime:
+						this.session.serverCurrentTime != null ? new Date(this.session.serverCurrentTime).toISOString() : null,
+					userType: this.userType,
 				},
 				studentIDs: this.session.studentIDs,
 				qil: {
-					includes: 1
-				}
+					includes: 1,
+				},
 			} as { userSessionVO: UserSessionVO | null; studentIDs: number | number[]; qil: QueryIncludeListVO | null };
 			this.api.client.getStudentData(
 				data,
@@ -82,70 +100,47 @@ export default class User {
 		});
 	}
 
+	/**
+	 * Get the information about the first student on the account.
+	 *
+	 * @deprecated Use `getStudentInfo()` to better support multi-user accounts.
+	 * @return A promise that resolves with the user's student info, and rejects with an Error if one occurred.
+	 */
+	public async getStudentInfo(): Promise<StudentInfo> {
+		return (await this.getStudentsInfo())[0];
+	}
+
+	/**
+	 * Parses the raw student data and converts it into the custom classes.
+	 * @param result The raw student data.
+	 * @return The parsed student data.
+	 */
 	private _parseStudentInfoResult(result: getStudentDataResponse) {
 		const parsed: StudentInfo[] = [];
-		const studentsData = this.safelyParseUnpredictableArray(result.return!.studentDataVOs);
+		const studentsData = parseArray(result.return!.studentDataVOs);
 
-		studentsData.forEach((data, i) => {
+		for (let [, data] of studentsData.entries()) {
 			const studentData = new StudentInfo();
 			const notNull = <Data>(data: Data): Data extends null ? never : Data => data as any;
 			data = notNull(data);
 
-			// Deserialize any data we might need for special types
-			const schools = this.safelyParseUnpredictableArray(data.schools).map((data) =>
-				School.fromData(data!, this.api._cachedInfo)
-			); // for some reason sometimes is an array, sometimes is one school.
-			const teachers = this.safelyParseUnpredictableArray(data.teachers).map((data) => Teacher.fromData(data!));
-			const terms = this.safelyParseUnpredictableArray(data.terms).map((data) =>
-				Term.fromData(data!, this.api._cachedInfo)
-			);
-			const reportingTerms = this.safelyParseUnpredictableArray(data.reportingTerms).map((data) =>
-				ReportingTerm.fromData(data!, this.api._cachedInfo)
-			);
-			const assignments = this.safelyParseUnpredictableArray(data.assignments).map((data) =>
-				Assignment.fromData(data!, this.api._cachedInfo)
-			);
-			const assignmentScores = this.safelyParseUnpredictableArray(data.assignmentScores).map((data, j) => {
-				if (i === 0 && j === 0) {
-					console.log("assignmentScores");
-					console.dir(data);
-					console.dir(AssignmentScore.fromData(data!, this.api._cachedInfo));
-				}
-				return AssignmentScore.fromData(data!, this.api._cachedInfo);
-			});
-			const attendanceCodes = this.safelyParseUnpredictableArray(data.attendanceCodes).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("attendanceCodes");
-					console.dir(data);
-				} */
-				return AttendanceCode.fromData(data!, this.api._cachedInfo);
-			});
-			const periods = this.safelyParseUnpredictableArray(data.periods).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("periods");
-					console.dir(data);
-				} */
-				return Period.fromData(data!, this.api._cachedInfo);
-			});
-			const courses = this.safelyParseUnpredictableArray(data.sections).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("sections");
-					console.dir(data);
-				} */
-				return Course.fromData(data!, this.api._cachedInfo);
-			});
-			const finalGrades = this.safelyParseUnpredictableArray(data.finalGrades).map((data, j) => {
-				/* if (i === 0 && j === 0) {
-					console.log("finalGrades");
-					console.dir(data);
-				} */
-				return FinalGrade.fromData(data!, this.api._cachedInfo);
-			});
+			const cache = this.api._cachedInfo,
+				// Deserialize any data we might need for special types
+				schools = parseArray(data.schools).map((data) => School.fromData(data!, cache)), // for some reason sometimes is an array, sometimes is one school.
+				teachers = parseArray(data.teachers).map((data) => Teacher.fromData(data!)),
+				terms = parseArray(data.terms).map((data) => Term.fromData(data!, cache)),
+				reportingTerms = parseArray(data.reportingTerms).map((data) => ReportingTerm.fromData(data!, cache)),
+				assignments = parseArray(data.assignments).map((data) => Assignment.fromData(data!, cache)),
+				assignmentScores = parseArray(data.assignmentScores).map((data) => AssignmentScore.fromData(data!, cache)),
+				attendanceCodes = parseArray(data.attendanceCodes).map((data) => AttendanceCode.fromData(data!, cache)),
+				periods = parseArray(data.periods).map((data) => Period.fromData(data!, cache)),
+				courses = parseArray(data.sections).map((data) => Course.fromData(data!, cache)),
+				finalGrades = parseArray(data.finalGrades).map((data) => FinalGrade.fromData(data!, cache));
 
 			// Add assignments to their categories
 			const assignmentCategories: Record<string, AssignmentCategory> = {};
-			this.safelyParseUnpredictableArray(data.assignmentCategories).forEach(
-				(data) => (assignmentCategories[data!.id] = AssignmentCategory.fromData(data!, this.api._cachedInfo))
+			parseArray(data.assignmentCategories).forEach(
+				(data) => (assignmentCategories[data!.id] = AssignmentCategory.fromData(data!, cache))
 			);
 			assignments
 				.filter((a) => assignmentCategories[a.categoryID])
@@ -171,37 +166,31 @@ export default class User {
 			studentData.courses = courses;
 			studentData.terms = terms;
 			studentData.reportingTerms = reportingTerms;
-			studentData.notInSessionDays = this.safelyParseUnpredictableArray(data.notInSessionDays).map((data) =>
+			studentData.notInSessionDays = parseArray(data.notInSessionDays).map((data) =>
 				Event.fromData(data!, this.api._cachedInfo)
 			);
 			studentData.student = Student.fromData(data.student!, this.api._cachedInfo);
 			studentData.yearID = data.yearId;
 			studentData.assignmentCategories = Object.values(assignmentCategories);
-			studentData.attendanceRecords = this.safelyParseUnpredictableArray(data.attendance).map((data) =>
+			studentData.attendanceRecords = parseArray(data.attendance).map((data) =>
 				AttendanceRecord.fromData(data!, this.api._cachedInfo)
 			);
 			studentData.attendanceCodes = attendanceCodes;
 			studentData.finalGrades = finalGrades;
 
 			parsed.push(studentData);
-		});
+		}
 
 		return parsed;
 	}
+}
 
-	private safelyParseUnpredictableArray<T>(arr: T | T[]): NonNullable<T[]> {
-		if (!arr) return [];
-		if (Array.isArray(arr)) return arr;
-		return [arr];
-	}
-
-	/**
-	 * Get the information about the first student on the account.
-	 *
-	 * @deprecated Use `getStudentInfo()` to better support multi-user accounts.
-	 * @return A promise that resolves with the user's student info, and rejects with an Error if one occurred.
-	 */
-	public async getStudentInfo(): Promise<StudentInfo> {
-		return (await this.getStudentsInfo())[0];
-	}
+/**
+ * Safely parse an unpredictable array. Sometimes arrays are not actually arrays.
+ * @param arr The data to make sure is an array.
+ */
+export function parseArray<T>(arr: T | T[]): T extends null ? never : T[] {
+	if (!arr) return [] as unknown as T extends null ? never : T[];
+	if (Array.isArray(arr)) return arr as unknown as T extends null ? never : T[];
+	return [arr] as unknown as T extends null ? never : T[];
 }

@@ -1,4 +1,4 @@
-import { CacheInfo } from '..';
+import { CacheInfo } from "..";
 import { PeriodVO } from "../types";
 import type School from "./School";
 
@@ -6,6 +6,9 @@ import type School from "./School";
  * A PowerSchool period.
  */
 export default class Period {
+	/**
+	 * The API cache.
+	 */
 	private declare _cache: CacheInfo;
 
 	/**
@@ -53,39 +56,39 @@ export default class Period {
 	/**
 	 * @internal
 	 */
-	constructor(
-		cache: CacheInfo,
-		abbreviation: string | null,
-		id: number,
-		name: string | null,
-		number: number,
-		schoolID: number,
-		sortOrder: number,
-		yearID: number
-	) {
+	constructor(cache: CacheInfo, data: PeriodData) {
 		this._cache = cache ?? null;
-		this.abbreviation = abbreviation ?? null;
-		this.id = id ?? null;
-		this.name = name ?? null;
-		this.number = number ?? null;
-		this.schoolID = schoolID ?? null;
-		this.sortOrder = sortOrder ?? null;
-		this.yearID = yearID ?? null;
+		this.abbreviation = data.abbreviation ?? null;
+		this.id = data.id ?? null;
+		this.name = data.name ?? null;
+		this.number = data.number ?? null;
+		this.schoolID = data.schoolID ?? null;
+		this.sortOrder = data.sortOrder ?? null;
+		this.yearID = data.yearID ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: PeriodVO, cache: CacheInfo) {
-		return new Period(
-			cache,
-			data.abbreviation,
-			data.id != null ? +data.id : null!,
-			data.name,
-			data.periodNumber != null ? +data.periodNumber : null!,
-			data.schoolid != null ? +data.schoolid : null!,
-			data.sortOrder != null ? +data.sortOrder : null!,
-			data.yearid != null ? +data.yearid : null!
-		);
+		return new Period(cache, {
+			abbreviation: data.abbreviation,
+			id: data.id != null ? +data.id : null!,
+			name: data.name,
+			number: data.periodNumber != null ? +data.periodNumber : null!,
+			schoolID: data.schoolid != null ? +data.schoolid : null!,
+			sortOrder: data.sortOrder != null ? +data.sortOrder : null!,
+			yearID: data.yearid != null ? +data.yearid : null!,
+		});
 	}
+}
+
+export interface PeriodData {
+	abbreviation: string | null;
+	id: number;
+	name: string | null;
+	number: number;
+	schoolID: number;
+	sortOrder: number;
+	yearID: number;
 }

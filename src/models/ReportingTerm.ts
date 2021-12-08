@@ -7,7 +7,20 @@ import type Term from "./Term";
  * A PowerSchool reporting term. Marks are divided and given out in reporting terms.
  */
 export default class ReportingTerm {
+	/**
+	 * The API cache.
+	 */
 	private declare _cache: CacheInfo;
+
+	/**
+	 * The abbreviated title of this reporting term, for use in smaller spaces.
+	 */
+	public declare abbreviatedTitle: string | null;
+
+	/**
+	 * The date this reporting term ends.
+	 */
+	public declare endDate: Date | null;
 
 	/**
 	 * The ID of this reporting term.
@@ -15,19 +28,19 @@ export default class ReportingTerm {
 	public declare id: number;
 
 	/**
-	 * The title of this reporting term.
+	 * Whether or not this reporting term is sending grades.
 	 */
-	public declare title: string | null;
-
-	/**
-	 * The ID of this reporting term's term.
-	 */
-	public declare termID: number;
+	public declare sendingGrades: boolean;
 
 	/**
 	 * A number to use to sort this reporting term among others.
 	 */
 	public declare sortOrder: number;
+
+	/**
+	 * The date this reporting term starts.
+	 */
+	public declare startDate: Date | null;
 
 	/**
 	 * Whether or not to suppress showing grades from this reporting term.
@@ -40,36 +53,19 @@ export default class ReportingTerm {
 	public declare suppressPercents: boolean;
 
 	/**
-	 * The abbreviated title of this reporting term, for use in smaller spaces.
+	 * The ID of this reporting term's term.
 	 */
-	public declare abbreviatedTitle: string | null;
+	public declare termID: number;
 
 	/**
-	 *
+	 * The title of this reporting term.
 	 */
-	public declare endDate: Date | null;
+	public declare title: string | null;
 
 	/**
-	 *
-	 */
-	public declare sendingGrades: boolean;
-
-	/**
-	 *
-	 */
-	public declare startDate: Date | null;
-
-	/**
-	 *
+	 * The ID of the year this reporting term is in.
 	 */
 	public declare yearID: number;
-
-	/**
-	 * Get the term this reporting term is from.
-	 */
-	public get term(): Term {
-		return this._cache.terms[this.termID];
-	}
 
 	/**
 	 * Get the final grades returned from this reporting term.
@@ -79,53 +75,60 @@ export default class ReportingTerm {
 	}
 
 	/**
+	 * Get the term this reporting term is from.
+	 */
+	public get term(): Term {
+		return this._cache.terms[this.termID];
+	}
+
+	/**
 	 * @internal
 	 */
-	constructor(
-		cache: CacheInfo,
-		id: number,
-		title: string | null,
-		termID: number,
-		sortOrder: number,
-		suppressGrades: boolean,
-		suppressPercents: boolean,
-		abbreviatedTitle: string | null = null,
-		endDate: Date | null,
-		sendingGrades: boolean,
-		startDate: Date | null,
-		yearID: number
-	) {
+	constructor(cache: CacheInfo, data: ReportingTermData) {
 		this._cache = cache ?? null;
-		this.abbreviatedTitle = abbreviatedTitle ?? null;
-		this.endDate = endDate ?? null;
-		this.id = id ?? null;
-		this.sendingGrades = sendingGrades ?? null;
-		this.sortOrder = sortOrder ?? null;
-		this.startDate = startDate ?? null;
-		this.suppressGrades = suppressGrades ?? null;
-		this.suppressPercents = suppressPercents ?? null;
-		this.termID = termID ?? null;
-		this.title = title ?? null;
-		this.yearID = yearID ?? null;
+		this.abbreviatedTitle = data.abbreviatedTitle ?? null;
+		this.endDate = data.endDate ?? null;
+		this.id = data.id ?? null;
+		this.sendingGrades = data.sendingGrades ?? null;
+		this.sortOrder = data.sortOrder ?? null;
+		this.startDate = data.startDate ?? null;
+		this.suppressGrades = data.suppressGrades ?? null;
+		this.suppressPercents = data.suppressPercents ?? null;
+		this.termID = data.termID ?? null;
+		this.title = data.title ?? null;
+		this.yearID = data.yearID ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	static fromData(data: ReportingTermVO, cache: CacheInfo) {
-		return new ReportingTerm(
-			cache,
-			data.id != null ? +data.id : null!,
-			data.title,
-			data.termid != null ? +data.termid : null!,
-			data.sortOrder != null ? +data.sortOrder : null!,
-			data.suppressGrades,
-			data.suppressPercents,
-			data.abbreviation,
-			data.endDate,
-			data.sendingGrades,
-			data.startDate,
-			data.yearid
-		);
+		return new ReportingTerm(cache, {
+			abbreviatedTitle: data.abbreviation,
+			endDate: data.endDate,
+			id: data.id != null ? +data.id : null!,
+			sendingGrades: data.sendingGrades,
+			sortOrder: data.sortOrder != null ? +data.sortOrder : null!,
+			startDate: data.startDate,
+			suppressGrades: data.suppressGrades,
+			suppressPercents: data.suppressPercents,
+			termID: data.termid != null ? +data.termid : null!,
+			title: data.title,
+			yearID: data.yearid,
+		});
 	}
+}
+
+export interface ReportingTermData {
+	abbreviatedTitle: string | null;
+	endDate: Date | null;
+	id: number;
+	sendingGrades: boolean;
+	sortOrder: number;
+	startDate: Date | null;
+	suppressGrades: boolean;
+	suppressPercents: boolean;
+	termID: number;
+	title: string | null;
+	yearID: number;
 }

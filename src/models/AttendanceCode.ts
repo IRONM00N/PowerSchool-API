@@ -1,4 +1,4 @@
-import { CacheInfo } from '..';
+import { CacheInfo } from "..";
 import { AttendanceCodeVO } from "../types";
 import type School from "./School";
 
@@ -6,12 +6,10 @@ import type School from "./School";
  * A code assigned to a PowerSchool attendance record.
  */
 export default class AttendanceCode {
-	private declare _cache: CacheInfo;
-
 	/**
-	 * The ID of this attendance code.
+	 * The API cache.
 	 */
-	public declare id: number;
+	private declare _cache: CacheInfo;
 
 	/**
 	 * The string representing this code.
@@ -24,9 +22,9 @@ export default class AttendanceCode {
 	public declare description: string | null;
 
 	/**
-	 * The type of this code.
+	 * The ID of this attendance code.
 	 */
-	public declare type: number | null;
+	public declare id: number;
 
 	/**
 	 * The number of the school this code belongs to.
@@ -37,6 +35,11 @@ export default class AttendanceCode {
 	 * A number representing the order this code should appear in when sorted.
 	 */
 	public declare sortOrder: number | null;
+
+	/**
+	 * The type of this code.
+	 */
+	public declare type: number | null;
 
 	/**
 	 * The year ID this code is valid for.
@@ -53,39 +56,39 @@ export default class AttendanceCode {
 	/**
 	 * @internal
 	 */
-	public constructor(
-		cache: CacheInfo,
-		id: number,
-		code: string | null,
-		description: string | null,
-		type: number | null,
-		schoolNumber: number,
-		sortOrder: number | null,
-		yearID: number | null
-	) {
+	public constructor(cache: CacheInfo, data: AttendanceCodeData) {
 		this._cache = cache ?? null;
-		this.code = code ?? null;
-		this.description = description ?? null;
-		this.id = id ?? null;
-		this.schoolNumber = schoolNumber ?? null;
-		this.sortOrder = sortOrder ?? null;
-		this.type = type ?? null;
-		this.yearID = yearID ?? null;
+		this.code = data.code ?? null;
+		this.description = data.description ?? null;
+		this.id = data.id ?? null;
+		this.schoolNumber = data.schoolNumber ?? null;
+		this.sortOrder = data.sortOrder ?? null;
+		this.type = data.type ?? null;
+		this.yearID = data.yearID ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: AttendanceCodeVO, cache: CacheInfo) {
-		return new AttendanceCode(
-			cache,
-			data.id != null ? +data.id : null!,
-			data.attCode,
-			data.description,
-			data.codeType != null ? +data.codeType : null,
-			data.schoolid != null ? +data.schoolid : null!,
-			data.sortorder != null ? +data.sortorder : null,
-			data.yearid != null ? +data.yearid : null
-		);
+		return new AttendanceCode(cache, {
+			code: data.attCode,
+			description: data.description,
+			id: data.id != null ? +data.id : null!,
+			schoolNumber: data.schoolid != null ? +data.schoolid : null!,
+			sortOrder: data.sortorder != null ? +data.sortorder : null,
+			type: data.codeType != null ? +data.codeType : null,
+			yearID: data.yearid != null ? +data.yearid : null,
+		});
 	}
+}
+
+export interface AttendanceCodeData {
+	code: string | null;
+	description: string | null;
+	id: number;
+	schoolNumber: number;
+	sortOrder: number | null;
+	type: number | null;
+	yearID: number | null;
 }

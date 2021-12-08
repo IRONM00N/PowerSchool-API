@@ -16,34 +16,49 @@ import type Term from "./Term";
  */
 export default class StudentInfo {
 	/**
-	 * The student's school.
+	 * The student's assignments, sorted into categories
 	 */
-	public declare schools: School[] | null;
+	public declare assignmentCategories: AssignmentCategory[] | null;
 
 	/**
-	 * The student's available periods.
+	 * The student's available attendance codes.
 	 */
-	public declare periods: Array<Period> | null;
+	public declare attendanceCodes: AttendanceCode[] | null;
+
+	/**
+	 * The student's attendance records (deviations from normal attendance).
+	 */
+	public declare attendanceRecords: AttendanceRecord[] | null;
 
 	/**
 	 * The student's current courses.
 	 */
-	public declare courses: Array<Course> | null;
+	public declare courses: Course[] | null;
 
 	/**
-	 * The student's available terms.
+	 * The student's final grades.
 	 */
-	public declare terms: Array<Term> | null;
-
-	/**
-	 * The student's reporting terms.
-	 */
-	public declare reportingTerms: Array<ReportingTerm> | null;
+	public declare finalGrades: FinalGrade[] | null;
 
 	/**
 	 * The student's days where school isn't in session.
 	 */
-	public declare notInSessionDays: Array<Event> | null;
+	public declare notInSessionDays: Event[] | null;
+
+	/**
+	 * The student's available periods.
+	 */
+	public declare periods: Period[] | null;
+
+	/**
+	 * The student's reporting terms.
+	 */
+	public declare reportingTerms: ReportingTerm[] | null;
+
+	/**
+	 * The student's school.
+	 */
+	public declare schools: School[] | null;
 
 	/**
 	 * An object holding basic information about this student.
@@ -53,32 +68,17 @@ export default class StudentInfo {
 	/**
 	 * The student's teachers.
 	 */
-	public declare teachers: Array<Teacher> | null;
+	public declare teachers: Teacher[] | null;
+
+	/**
+	 * The student's available terms.
+	 */
+	public declare terms: Term[] | null;
 
 	/**
 	 * The student's current year ID.
 	 */
 	public declare yearID: number | null;
-
-	/**
-	 * The student's assignments, sorted into categories
-	 */
-	public declare assignmentCategories: Array<AssignmentCategory> | null;
-
-	/**
-	 * The student's attendance records (deviations from normal attendance).
-	 */
-	public declare attendanceRecords: Array<AttendanceRecord> | null;
-
-	/**
-	 * The student's available attendance codes.
-	 */
-	public declare attendanceCodes: Array<AttendanceCode> | null;
-
-	/**
-	 * The student's final grades.
-	 */
-	public declare finalGrades: Array<FinalGrade> | null;
 
 	/**
 	 * @internal

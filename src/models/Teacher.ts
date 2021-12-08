@@ -5,9 +5,9 @@ import { TeacherVO } from "../types";
  */
 export default class Teacher {
 	/**
-	 * The ID of this teacher.
+	 * The email of this teacher, if provided.
 	 */
-	public declare id: number;
+	public declare email: string | null;
 
 	/**
 	 * The first name of this teacher.
@@ -15,14 +15,14 @@ export default class Teacher {
 	public declare firstName: string | null;
 
 	/**
+	 * The ID of this teacher.
+	 */
+	public declare id: number;
+
+	/**
 	 * The last name of this teacher.
 	 */
 	public declare lastName: string | null;
-
-	/**
-	 * The email of this teacher, if provided.
-	 */
-	public declare email: string | null;
 
 	/**
 	 * The phone of this teacher's school, if provided.
@@ -30,42 +30,50 @@ export default class Teacher {
 	public declare schoolPhone: string | null;
 
 	/**
+	 * Get teacher's name formatted for display.
+	 */
+	public get formattedName(): string {
+		return this.nameParts.join(" ");
+	}
+
+	/**
+	 * Get the parts making up a teacher's name.
+	 */
+	public get nameParts(): string[] {
+		if (this.firstName == null) throw new Error("firstName is null");
+		if (this.lastName == null) throw new Error("lastName is null");
+		return [this.firstName, this.lastName];
+	}
+
+	/**
 	 * @internal
 	 */
-	constructor(
-		id: number,
-		firstName: string | null,
-		lastName: string | null,
-		email: string | null,
-		schoolPhone: string | null
-	) {
-		this.email = email ?? null;
-		this.firstName = firstName ?? null;
-		this.id = id ?? null;
-		this.lastName = lastName ?? null;
-		this.schoolPhone = schoolPhone ?? null;
+	constructor(data: TeacherData) {
+		this.email = data.email ?? null;
+		this.firstName = data.firstName ?? null;
+		this.id = data.id ?? null;
+		this.lastName = data.lastName ?? null;
+		this.schoolPhone = data.schoolPhone ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	static fromData(data: TeacherVO) {
-		return new Teacher(data.id != null ? +data.id : null!, data.firstName, data.lastName, data.email, data.schoolPhone);
+		return new Teacher({
+			email: data.email,
+			firstName: data.firstName,
+			id: data.id != null ? +data.id : null!,
+			lastName: data.lastName,
+			schoolPhone: data.schoolPhone,
+		});
 	}
+}
 
-	/**
-	 * Get the parts making up a teacher's name.
-	 */
-	public getNameParts(): string[] {
-		if (!this.firstName) throw new Error("firstName is null");
-		if (!this.lastName) throw new Error("lastName is null");
-		return [this.firstName, this.lastName];
-	}
-
-	/**
-	 * Get teacher's name formatted for display.
-	 */
-	public getFormattedName(): string {
-		return this.getNameParts().join(" ");
-	}
+export interface TeacherData {
+	email: string | null;
+	firstName: string | null;
+	id: number;
+	lastName: string | null;
+	schoolPhone: string | null;
 }

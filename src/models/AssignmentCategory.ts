@@ -6,22 +6,20 @@ import type Assignment from "./Assignment";
  * A category for a PowerSchool assignment.
  */
 export default class AssignmentCategory {
+	/**
+	 * The API cache.
+	 */
 	private declare _cache: CacheInfo;
-
-	/**
-	 * The ID of this assignment.
-	 */
-	public declare id: number;
-
-	/**
-	 * The name of this category.
-	 */
-	public declare name: string | null;
 
 	/**
 	 * A shorter name for this category.
 	 */
 	public declare abbreviation: string | null;
+
+	/**
+	 * The assignments in this category.
+	 */
+	public declare assignments: Assignment[];
 
 	/**
 	 * A description of this category, if available.
@@ -34,41 +32,46 @@ export default class AssignmentCategory {
 	public declare gradeBookType: number;
 
 	/**
-	 * The assignments in this category.
+	 * The ID of this assignment.
 	 */
-	public declare assignments: Assignment[];
+	public declare id: number;
+
+	/**
+	 * The name of this category.
+	 */
+	public declare name: string | null;
 
 	/**
 	 * @internal
 	 */
-	public constructor(
-		cache: CacheInfo,
-		id: number,
-		name: string | null,
-		abbreviation: string | null,
-		description: string | null,
-		gradeBookType: number
-	) {
+	public constructor(cache: CacheInfo, data: AssignmentCategoryData) {
 		this._cache = cache ?? null;
-		this.abbreviation = abbreviation ?? null;
+		this.abbreviation = data.abbreviation ?? null;
 		this.assignments = [];
-		this.description = description ?? null;
-		this.gradeBookType = gradeBookType ?? null;
-		this.id = id ?? null;
-		this.name = name ?? null;
+		this.description = data.description ?? null;
+		this.gradeBookType = data.gradeBookType ?? null;
+		this.id = data.id ?? null;
+		this.name = data.name ?? null;
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: AsmtCatVO, cache: CacheInfo) {
-		return new AssignmentCategory(
-			cache,
-			data.id != null ? data.id : null!,
-			data.name,
-			data.abbreviation,
-			data.description,
-			data.gradeBookType != null ? +data.gradeBookType : null!
-		);
+		return new AssignmentCategory(cache, {
+			abbreviation: data.abbreviation,
+			description: data.description,
+			gradeBookType: data.gradeBookType != null ? +data.gradeBookType : null!,
+			id: data.id != null ? +data.id : null!,
+			name: data.name,
+		});
 	}
+}
+
+export interface AssignmentCategoryData {
+	abbreviation: string | null;
+	description: string | null;
+	gradeBookType: number;
+	id: number;
+	name: string | null;
 }
