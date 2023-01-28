@@ -1,6 +1,6 @@
-import { CacheInfo } from "..";
-import { AsmtCatVO } from "../types";
-import type Assignment from "./Assignment";
+import { CacheInfo } from "../index.js";
+import { AsmtCatVO } from "../types.js";
+import type Assignment from "./Assignment.js";
 
 /**
  * A category for a PowerSchool assignment.
@@ -9,7 +9,7 @@ export default class AssignmentCategory {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * A shorter name for this category.
@@ -45,13 +45,17 @@ export default class AssignmentCategory {
 	 * @internal
 	 */
 	public constructor(cache: CacheInfo, data: AssignmentCategoryData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.abbreviation = data.abbreviation ?? null;
 		this.assignments = [];
 		this.description = data.description ?? null;
 		this.gradeBookType = data.gradeBookType ?? null;
 		this.id = data.id ?? null;
 		this.name = data.name ?? null;
+	}
+
+	public toString(): string {
+		return this.name ?? "";
 	}
 
 	/**

@@ -1,6 +1,6 @@
-import { CacheInfo } from "..";
-import { PeriodVO } from "../types";
-import type School from "./School";
+import type { CacheInfo } from "../index.js";
+import type { PeriodVO } from "../types.js";
+import type School from "./School.js";
 
 /**
  * A PowerSchool period.
@@ -9,7 +9,7 @@ export default class Period {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The abbreviation of this period.
@@ -50,14 +50,14 @@ export default class Period {
 	 * Get the school this period is from.
 	 */
 	public get school(): School {
-		return this._cache.schools[this.schoolID];
+		return this.#cache.schools[this.schoolID];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(cache: CacheInfo, data: PeriodData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.abbreviation = data.abbreviation ?? null;
 		this.id = data.id ?? null;
 		this.name = data.name ?? null;

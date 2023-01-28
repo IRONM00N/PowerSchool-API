@@ -1,6 +1,6 @@
-import type { CacheInfo } from "..";
-import { DisabledFeaturesVO, SchoolVO } from "../types";
-import type AttendanceCode from "./AttendanceCode";
+import type { CacheInfo } from "../index.js";
+import type { DisabledFeaturesVO, SchoolVO } from "../types.js";
+import type AttendanceCode from "./AttendanceCode.js";
 
 /**
  * A PowerSchool school information object.
@@ -9,7 +9,7 @@ export default class School {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The abbreviation for the school.
@@ -85,7 +85,7 @@ export default class School {
 	 * Get the attendance codes that belong to this school.
 	 */
 	public get attendanceCodes(): AttendanceCode[] {
-		return Object.values(this._cache.attendanceCodes).filter(
+		return Object.values(this.#cache.attendanceCodes).filter(
 			(c: any) => c.schoolNumber == this.schoolNumber
 		) as AttendanceCode[];
 	}
@@ -94,7 +94,7 @@ export default class School {
 	 * @internal
 	 */
 	constructor(cache: CacheInfo, data: SchoolData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.abbreviation = data.abbreviation ?? null;
 		this.addressParts = data.addressParts ?? null;
 		this.currentTermId = data.currentTermId ?? null;

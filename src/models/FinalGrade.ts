@@ -1,7 +1,7 @@
-import { CacheInfo } from "..";
-import { FinalGradeVO } from "../types";
-import type Course from "./Course";
-import type ReportingTerm from "./ReportingTerm";
+import type { CacheInfo } from "../index.js";
+import type { FinalGradeVO } from "../types.js";
+import type Course from "./Course.js";
+import type ReportingTerm from "./ReportingTerm.js";
 
 /**
  * An object representing the final grade in a PowerSchool course.
@@ -10,7 +10,7 @@ export default class FinalGrade {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The teacher's comment for this grade, if available.
@@ -51,21 +51,21 @@ export default class FinalGrade {
 	 * Get the course this grade is from.
 	 */
 	public get course(): Course {
-		return this._cache.courses[this.courseID];
+		return this.#cache.courses[this.courseID];
 	}
 
 	/**
 	 * Get the reporting term this grade is from.
 	 */
 	public get reportingTerm(): ReportingTerm {
-		return this._cache.reportingTerms[this.reportingTermID];
+		return this.#cache.reportingTerms[this.reportingTermID];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(cache: CacheInfo, data: FinalGradeData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.comment = data.comment ?? null;
 		this.courseID = data.courseID ?? null;
 		this.date = data.date ?? null;

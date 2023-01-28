@@ -1,7 +1,7 @@
-import { CacheInfo } from "..";
-import { ReportingTermVO } from "../types";
-import type FinalGrade from "./FinalGrade";
-import type Term from "./Term";
+import type { CacheInfo } from "../index.js";
+import type { ReportingTermVO } from "../types.js";
+import type FinalGrade from "./FinalGrade.js";
+import type Term from "./Term.js";
 
 /**
  * A PowerSchool reporting term. Marks are divided and given out in reporting terms.
@@ -10,7 +10,7 @@ export default class ReportingTerm {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The abbreviated title of this reporting term, for use in smaller spaces.
@@ -71,21 +71,21 @@ export default class ReportingTerm {
 	 * Get the final grades returned from this reporting term.
 	 */
 	public get finalGrades(): FinalGrade[] {
-		return Object.values(this._cache.finalGrades).filter((g: any) => g.reportingTermID == this.id) as FinalGrade[];
+		return Object.values(this.#cache.finalGrades).filter((g: any) => g.reportingTermID == this.id) as FinalGrade[];
 	}
 
 	/**
 	 * Get the term this reporting term is from.
 	 */
 	public get term(): Term {
-		return this._cache.terms[this.termID];
+		return this.#cache.terms[this.termID];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(cache: CacheInfo, data: ReportingTermData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.abbreviatedTitle = data.abbreviatedTitle ?? null;
 		this.endDate = data.endDate ?? null;
 		this.id = data.id ?? null;

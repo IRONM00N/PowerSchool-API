@@ -1,6 +1,6 @@
-import { CacheInfo } from "..";
-import { TermVO } from "../types";
-import type School from "./School";
+import type { CacheInfo } from "../index.js";
+import type { TermVO } from "../types.js";
+import type School from "./School.js";
 
 /**
  * A PowerSchool term, for which courses can be a part of.
@@ -9,7 +9,7 @@ export default class Term {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The abbreviated title of this term, for use in smaller spaces.
@@ -56,14 +56,14 @@ export default class Term {
 	 */
 	public get school(): School {
 		if (this.schoolNumber == null) throw new Error("schoolNumber is null");
-		return this._cache.schools[+this.schoolNumber];
+		return this.#cache.schools[+this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	constructor(cache: CacheInfo, data: TermData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.abbreviatedTitle = data.abbreviatedTitle ?? null;
 		this.endDate = data.endDate ?? null;
 		this.id = data.id ?? null;

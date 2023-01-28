@@ -1,21 +1,21 @@
-import type PowerSchoolAPI from "../index";
-import { getStudentDataResponse, QueryIncludeListVO, UserSessionVO } from "../types";
-import Assignment from "./Assignment";
-import AssignmentCategory from "./AssignmentCategory";
-import AssignmentScore from "./AssignmentScore";
-import AttendanceCode from "./AttendanceCode";
-import AttendanceRecord from "./AttendanceRecord";
-import Course from "./Course";
-import Event from "./Event";
-import FinalGrade from "./FinalGrade";
-import Period from "./Period";
-import ReportingTerm from "./ReportingTerm";
-import School from "./School";
-import Student from "./Student";
-import StudentInfo from "./StudentInfo";
-import Teacher from "./Teacher";
-import Term from "./Term";
-import UserSession from "./UserSession";
+import type PowerSchoolAPI from "../index.js";
+import { getStudentDataResponse, QueryIncludeListVO, UserSessionVO } from "../types.js";
+import Assignment from "./Assignment.js";
+import AssignmentCategory from "./AssignmentCategory.js";
+import AssignmentScore from "./AssignmentScore.js";
+import AttendanceCode from "./AttendanceCode.js";
+import AttendanceRecord from "./AttendanceRecord.js";
+import Course from "./Course.js";
+import Event from "./Event.js";
+import FinalGrade from "./FinalGrade.js";
+import Period from "./Period.js";
+import ReportingTerm from "./ReportingTerm.js";
+import School from "./School.js";
+import Student from "./Student.js";
+import StudentInfo from "./StudentInfo.js";
+import Teacher from "./Teacher.js";
+import Term from "./Term.js";
+import UserSession from "./UserSession.js";
 
 /**
  * A PowerSchool API user, which holds information about the user and methods to interact with them.
@@ -131,7 +131,7 @@ export default class User {
 				terms = parseArray(data.terms).map((data) => Term.fromData(data!, cache)),
 				reportingTerms = parseArray(data.reportingTerms).map((data) => ReportingTerm.fromData(data!, cache)),
 				assignments = parseArray(data.assignments).map((data) => Assignment.fromData(data!, cache)),
-				assignmentScores = parseArray(data.assignmentScores).map((data) => AssignmentScore.fromData(data!, cache)),
+				assignmentScores = parseArray(data.assignmentScores).map((data) => new AssignmentScore(data!, cache)),
 				attendanceCodes = parseArray(data.attendanceCodes).map((data) => AttendanceCode.fromData(data!, cache)),
 				periods = parseArray(data.periods).map((data) => Period.fromData(data!, cache)),
 				courses = parseArray(data.sections).map((data) => Course.fromData(data!, cache)),
@@ -169,7 +169,7 @@ export default class User {
 			studentData.notInSessionDays = parseArray(data.notInSessionDays).map((data) =>
 				Event.fromData(data!, this.api._cachedInfo)
 			);
-			studentData.student = Student.fromData(data.student!, this.api._cachedInfo);
+			studentData.student = new Student(data.student!, this.api._cachedInfo);
 			studentData.yearID = data.yearId;
 			studentData.assignmentCategories = Object.values(assignmentCategories);
 			studentData.attendanceRecords = parseArray(data.attendance).map((data) =>

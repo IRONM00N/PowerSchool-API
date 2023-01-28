@@ -1,128 +1,122 @@
-import { CacheInfo } from "..";
-import { StudentVO } from "../types";
-import type ReportingTerm from "./ReportingTerm";
+import type { CacheInfo } from "../index.js";
+import { parseDate, parseLong, StudentVO as StudentData } from "../types.js";
+import type ReportingTerm from "./ReportingTerm.js";
 
 /**
  * A object meant for holding basic information about a student.
  */
 export default class Student {
+	#data: StudentData;
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The student's current GPA, if grades are available (null if not).
 	 */
-	public declare currentGPA: string | null;
+	public get currentGPA(): string | null {
+		return this.#data.currentGPA ?? null;
+	}
 
 	/**
 	 * The student's current meal balance, if supported.
 	 */
-	public declare currentMealBalance: number;
+	public get currentMealBalance(): number {
+		return parseLong(this.#data.currentMealBalance) ?? 0;
+	}
 
 	/**
 	 * The student's current term, if available (null if not).
 	 */
-	public declare currentTerm: string | null;
+	public get currentTerm(): string | null {
+		return this.#data.currentTerm ?? null;
+	}
 
 	/**
 	 * The student's date of birth.
 	 */
-	public declare dateOfBirth: Date | null;
+	public get dateOfBirth(): Date | null {
+		return parseDate(this.#data.dob);
+	}
 
 	/**
 	 * The student's ethnicity (can be one of many things determined by the school itself).
 	 */
-	public declare ethnicity: string | null;
+	public get ethnicity(): string | null {
+		return this.#data.ethnicity ?? null;
+	}
 
 	/**
 	 * The student's first/given name.
 	 */
-	public declare firstName: string | null;
+	public get firstName(): string | null {
+		return this.#data.firstName ?? null;
+	}
 
 	/**
 	 * The student's gender (can be one of many things determined by the school itself).
 	 */
-	public declare gender: string | null;
+	public get gender(): string | null {
+		return this.#data.gender ?? null;
+	}
 
 	/**
 	 * The grade the student is currently in.
 	 */
-	public declare gradeLevel: number;
+	public get gradeLevel(): number {
+		return parseLong(this.#data.gradeLevel);
+	}
 
 	/**
 	 * The student's ID.
 	 */
-	public declare id: number;
+	public get id(): number {
+		return parseLong(this.#data.id);
+	}
 
 	/**
 	 * The student's last name/surname.
 	 */
-	public declare lastName: string | null;
+	public get lastName(): string | null {
+		return this.#data.lastName ?? null;
+	}
 
 	/**
 	 * The student's middle name.
 	 */
-	public declare middleName: string | null;
+	public get middleName(): string | null {
+		return this.#data.middleName ?? null;
+	}
 
 	/**
 	 * The date the student's photo was taken on.
 	 */
-	public declare photoDate: Date | null;
+	public get photoDate(): Date | null {
+		return parseDate(this.#data.photoDate);
+	}
 
 	/**
 	 * The student's starting meal balance, if supported.
 	 */
-	public declare startingMealBalance: number;
+	public get startingMealBalance(): number {
+		return parseLong(this.#data.startingMealBalance) ?? 0;
+	}
 
 	/**
 	 * Get the current reporting term the student is in.
 	 */
 	public get currentReportingTerm(): ReportingTerm {
 		// Why did they make this a title instead of ID?
-		return Object.values(this._cache.reportingTerms).find((term) => term.title == this.currentTerm)!;
+		return Object.values(this.#cache.reportingTerms).find((term) => term.title == this.currentTerm)!;
 	}
 
 	/**
 	 * @internal
 	 */
-	constructor(_cache: CacheInfo, data: StudentData) {
-		this._cache = _cache ?? null;
-		this.currentGPA = data.currentGPA ?? null;
-		this.currentMealBalance = data.currentMealBalance ?? 0;
-		this.currentTerm = data.currentTerm ?? null;
-		this.dateOfBirth = data.dateOfBirth ?? null;
-		this.ethnicity = data.ethnicity ?? null;
-		this.firstName = data.firstName ?? null;
-		this.gender = data.gender ?? null;
-		this.gradeLevel = data.gradeLevel ?? null;
-		this.id = data.id ?? null;
-		this.lastName = data.lastName ?? null;
-		this.middleName = data.middleName ?? null;
-		this.photoDate = data.photoDate ?? null;
-		this.startingMealBalance = data.startingMealBalance ?? 0;
-	}
-
-	/**
-	 * @internal
-	 */
-	static fromData(data: StudentVO, _cache: CacheInfo) {
-		return new Student(_cache, {
-			currentGPA: data.currentGPA ?? null,
-			currentMealBalance: data.currentMealBalance != null ? +data.currentMealBalance : null!,
-			currentTerm: data.currentTerm,
-			dateOfBirth: data.dob ? new Date(data.dob) : null,
-			ethnicity: data.ethnicity,
-			firstName: data.firstName,
-			gender: data.gender,
-			gradeLevel: data.gradeLevel != null ? +data.gradeLevel : null!,
-			id: data.id != null ? +data.id : null!,
-			lastName: data.lastName,
-			middleName: data.middleName,
-			photoDate: data.photoDate ? new Date(data.photoDate) : null,
-			startingMealBalance: data.startingMealBalance != null ? +data.startingMealBalance : null!,
-		});
+	constructor(data: StudentData, cache: CacheInfo) {
+		this.#data = data ?? null;
+		this.#cache = cache ?? null;
 	}
 
 	/**
@@ -144,20 +138,8 @@ export default class Student {
 	public getFormattedName(includeMiddleName: boolean = false): string {
 		return this.getNameParts(includeMiddleName).join(" ");
 	}
-}
 
-export interface StudentData {
-	currentGPA: string | null;
-	currentMealBalance: number | null;
-	currentTerm: string | null;
-	dateOfBirth: Date | null;
-	ethnicity: string | null;
-	firstName: string | null;
-	gender: string | null;
-	gradeLevel: number;
-	id: number;
-	lastName: string | null;
-	middleName: string | null;
-	photoDate: Date | null;
-	startingMealBalance: number | null;
+	public toString(): string {
+		return this.getFormattedName();
+	}
 }

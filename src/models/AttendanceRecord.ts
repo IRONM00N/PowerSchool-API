@@ -1,8 +1,8 @@
-import { CacheInfo } from "..";
-import { AttendanceVO } from "../types";
-import type AttendanceCode from "./AttendanceCode";
-import type Period from "./Period";
-import type School from "./School";
+import type { CacheInfo } from "../index.js";
+import type { AttendanceVO } from "../types.js";
+import type AttendanceCode from "./AttendanceCode.js";
+import type Period from "./Period.js";
+import type School from "./School.js";
 
 /**
  * A PowerSchool attendance record, such as a deviation from normal attendance.
@@ -11,7 +11,7 @@ export default class AttendanceRecord {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The identifier for this attendance record's code.
@@ -57,28 +57,28 @@ export default class AttendanceRecord {
 	 * Get the code of this record.
 	 */
 	public get code(): AttendanceCode {
-		return this._cache.attendanceCodes[this.codeID];
+		return this.#cache.attendanceCodes[this.codeID];
 	}
 
 	/**
 	 * Get the period this record covers.
 	 */
 	public get period(): Period {
-		return this._cache.periods[this.periodID];
+		return this.#cache.periods[this.periodID];
 	}
 
 	/**
 	 * Get the school this record belongs to.
 	 */
 	public get school(): School {
-		return this._cache.schools[this.schoolNumber];
+		return this.#cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(cache: CacheInfo, data: AttendanceRecordData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.codeID = data.codeID ?? null;
 		this.comment = data.comment ?? null;
 		this.date = data.date ?? null;

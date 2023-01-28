@@ -1,14 +1,22 @@
 import { CoreOptions } from "request";
 import { Client } from "soap";
 
+export function parseLong<T extends long | null>(long: T): T extends null ? null : number {
+	return typeof long != null ? Number(long) : (null as any);
+}
+
+export function parseDate<T extends Date | null>(date: T): T extends null ? null : Date {
+	return typeof date != null ? new Date(date as any) : (null as any);
+}
+
 type Cb<T> = (error: Error, result: T, rawResponse: unknown, soapHeader: unknown, rawRequest: unknown) => any;
 type Options = CoreOptions;
 type base64Binary = string;
-type int = number;
+export type int = number;
 // type long = string; // node-soap makes longs a string
-type long = number;
-type double = number;
-type decimal = number;
+export type long = number;
+export type double = number;
+export type decimal = number;
 
 export interface PublicPortalServiceJSONClient extends Client {
 	getCredentialComplexityRules(

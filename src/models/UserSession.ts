@@ -1,9 +1,9 @@
-import { Locale, UserSessionVO } from "../types";
-import ServerInfo from "./ServerInfo";
-import { parseArray } from "./User";
+import type { Locale, UserSessionVO } from "../types.js";
+import ServerInfo from "./ServerInfo.js";
+import { parseArray } from "./User.js";
 
 /**
- * The user's session information. 
+ * The user's session information.
  */
 export default class UserSession {
 	/**
@@ -73,7 +73,7 @@ export default class UserSession {
 		return new UserSession({
 			locale: data.locale,
 			serverCurrentTime: data.serverCurrentTime != null ? new Date(data.serverCurrentTime) : null,
-			serverInfo: data.serverInfo != null ? ServerInfo.fromData(data.serverInfo) : null,
+			serverInfo: data.serverInfo != null ? new ServerInfo(data.serverInfo) : null,
 			serviceTicket: data.serviceTicket,
 			studentIDs: parseArray(data.studentIDs),
 			ucProfileURIs: parseArray(data.ucProfileURIs),

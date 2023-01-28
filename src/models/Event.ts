@@ -1,6 +1,6 @@
-import { CacheInfo } from "..";
-import { NotInSessionDayVO } from "../types";
-import type School from "./School";
+import type { CacheInfo } from "../index.js";
+import type { NotInSessionDayVO } from "../types.js";
+import type School from "./School.js";
 
 /**
  * A PowerSchool event, such as a not in session day.
@@ -9,7 +9,7 @@ export default class Event {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The date of this event.
@@ -41,14 +41,14 @@ export default class Event {
 	 */
 	public get school(): School {
 		if (this.schoolNumber == null) throw new Error("schoolNumber is null");
-		return this._cache.schools[this.schoolNumber];
+		return this.#cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(cache: CacheInfo, data: EventsData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.date = data.date ?? null;
 		this.description = data.description ?? null;
 		this.id = data.id ?? null;

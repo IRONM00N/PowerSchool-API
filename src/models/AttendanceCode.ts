@@ -1,6 +1,6 @@
-import { CacheInfo } from "..";
-import { AttendanceCodeVO } from "../types";
-import type School from "./School";
+import { CacheInfo } from "../index.js";
+import { AttendanceCodeVO } from "../types.js";
+import type School from "./School.js";
 
 /**
  * A code assigned to a PowerSchool attendance record.
@@ -9,7 +9,7 @@ export default class AttendanceCode {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The string representing this code.
@@ -50,14 +50,14 @@ export default class AttendanceCode {
 	 * Get the school this code belongs to.
 	 */
 	public get school(): School {
-		return this._cache.schools[this.schoolNumber];
+		return this.#cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(cache: CacheInfo, data: AttendanceCodeData) {
-		this._cache = cache ?? null;
+		this.#cache = cache ?? null;
 		this.code = data.code ?? null;
 		this.description = data.description ?? null;
 		this.id = data.id ?? null;

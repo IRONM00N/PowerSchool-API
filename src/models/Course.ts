@@ -1,10 +1,10 @@
-import { CacheInfo } from "..";
-import { SectionVO, StartStopDateVO } from "../types";
-import type Assignment from "./Assignment";
-import type FinalGrade from "./FinalGrade";
-import type School from "./School";
-import type Teacher from "./Teacher";
-import type Term from "./Term";
+import type { CacheInfo } from "../index.js";
+import type { SectionVO, StartStopDateVO } from "../types.js";
+import type Assignment from "./Assignment.js";
+import type FinalGrade from "./FinalGrade.js";
+import type School from "./School.js";
+import type Teacher from "./Teacher.js";
+import type Term from "./Term.js";
 
 /**
  * A PowerSchool course.
@@ -13,7 +13,7 @@ export default class Course {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
 
 	/**
 	 * The code of this course.
@@ -96,42 +96,42 @@ export default class Course {
 	 * **NOTE:** This getter filters through all assignments every time it is called, so use it sparingly.
 	 */
 	public get assignments(): Assignment[] {
-		return Object.values(this._cache.assignments).filter((a: any) => a.courseID == this.id) as Assignment[];
+		return Object.values(this.#cache.assignments).filter((a: any) => a.courseID == this.id) as Assignment[];
 	}
 
 	/**
 	 * Get the final grade received in this course, if available.
 	 */
 	public get finalGrade(): FinalGrade {
-		return this._cache.finalGrades[this.id];
+		return this.#cache.finalGrades[this.id];
 	}
 
 	/**
 	 * Get the teacher teaching this course.
 	 */
 	public get teacher(): Teacher {
-		return this._cache.teachers[this.teacherID];
+		return this.#cache.teachers[this.teacherID];
 	}
 
 	/**
 	 * Get the term this course is a part of.
 	 */
 	public get term(): Term {
-		return this._cache.terms[this.termID];
+		return this.#cache.terms[this.termID];
 	}
 
 	/**
 	 * Get the school this course is from.
 	 */
 	public get school(): School {
-		return this._cache.schools[this.schoolNumber];
+		return this.#cache.schools[this.schoolNumber];
 	}
 
 	/**
 	 * @internal
 	 */
 	public constructor(api: CacheInfo, data: CourseData) {
-		this._cache = api ?? null;
+		this.#cache = api ?? null;
 		this.code = data.code ?? null;
 		this.DCID = data.DCID ?? null;
 		this.description = data.description ?? null;
@@ -191,13 +191,13 @@ export interface CourseData {
 	title: string | null;
 }
 
-function parseObjArr<T>(data: T | T[], keyToNum: string[] = []): T extends null ? never : T[] {
+function parseObjArr<T extends {} | null>(data: T | T[], keyToNum: string[] = []): T extends null ? never : T[] {
 	if (!data) return [] as unknown as T extends null ? never : T[];
 	const array = Array.isArray(data) ? [...data] : [{ ...data }];
 	for (const element of array) {
-		if ("attributes" in element) delete (element as any)["attributes"];
+		if ("attributes" in <any>element) delete (<any>element)["attributes"];
 		for (const key of keyToNum) {
-			if (key in element) (element as any)[key] = (element as any)[key] != null ? +(element as any)[key] : null;
+			if (key in <any>element) (<any>element)[key] = (<any>element)[key] != null ? +(<any>element)[key] : null;
 		}
 	}
 	return array as unknown as T extends null ? never : T[];

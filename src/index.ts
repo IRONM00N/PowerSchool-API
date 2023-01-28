@@ -1,18 +1,17 @@
 import { createClient } from "soap";
-import "source-map-support/register";
-import Assignment from "./models/Assignment";
-import AssignmentCategory from "./models/AssignmentCategory";
-import AssignmentScore from "./models/AssignmentScore";
-import AttendanceCode from "./models/AttendanceCode";
-import Course from "./models/Course";
-import FinalGrade from "./models/FinalGrade";
-import Period from "./models/Period";
-import ReportingTerm from "./models/ReportingTerm";
-import School from "./models/School";
-import Teacher from "./models/Teacher";
-import Term from "./models/Term";
-import User from "./models/User";
-import { PublicPortalServiceJSONClient } from "./types";
+import Assignment from "./models/Assignment.js";
+import AssignmentCategory from "./models/AssignmentCategory.js";
+import AssignmentScore from "./models/AssignmentScore.js";
+import AttendanceCode from "./models/AttendanceCode.js";
+import Course from "./models/Course.js";
+import FinalGrade from "./models/FinalGrade.js";
+import Period from "./models/Period.js";
+import ReportingTerm from "./models/ReportingTerm.js";
+import School from "./models/School.js";
+import Teacher from "./models/Teacher.js";
+import Term from "./models/Term.js";
+import User from "./models/User.js";
+import type { PublicPortalServiceJSONClient } from "./types.js";
 
 /**
  * The main PowerSchool API wrapper, for logging into user accounts and caching of retrieved info.

@@ -1,8 +1,8 @@
-import type { CacheInfo } from "..";
-import { AssignmentVO } from "../types";
-import type AssignmentCategory from "./AssignmentCategory";
-import type AssignmentScore from "./AssignmentScore";
-import type Course from "./Course";
+import type { CacheInfo } from "../index.js";
+import type { AssignmentVO } from "../types.js";
+import type AssignmentCategory from "./AssignmentCategory.js";
+import type AssignmentScore from "./AssignmentScore.js";
+import type Course from "./Course.js";
 
 /**
  * A PowerSchool assignment.
@@ -11,7 +11,8 @@ export default class Assignment {
 	/**
 	 * The API cache.
 	 */
-	private declare _cache: CacheInfo;
+	#cache: CacheInfo;
+	#data: AssignmentVO;
 
 	/**
 	 * A shorter name for this assignment.
@@ -107,28 +108,28 @@ export default class Assignment {
 	 * Get the score received on this assignment, if available.
 	 */
 	public get score(): AssignmentScore {
-		return this._cache.assignmentScores[this.id];
+		return this.#cache.assignmentScores[this.id];
 	}
 
 	/**
 	 * Get the category this assignment belongs to.
 	 */
 	public get category(): AssignmentCategory {
-		return this._cache.assignmentCategories[this.categoryID];
+		return this.#cache.assignmentCategories[this.categoryID];
 	}
 
 	/**
 	 * Get the course this assignment belongs to.
 	 */
 	public get course(): Course {
-		return this._cache.courses[this.courseID];
+		return this.#cache.courses[this.courseID];
 	}
 
 	/**
 	 * @internal
 	 */
-	public constructor(cache: CacheInfo, data: AssignmentData) {
-		this._cache = cache ?? null;
+	public constructor(cache: CacheInfo, data: AssignmentData, raw: AssignmentVO) {
+		this.#cache = cache ?? null;
 		this.abbreviation = data.abbreviation ?? null;
 		this.assignmentID = data.assignmentID ?? null;
 		this.categoryID = data.categoryID ?? null;
@@ -147,32 +148,41 @@ export default class Assignment {
 		this.publishState = data.publishState ?? null;
 		this.type = data.type ?? null;
 		this.weight = data.weight ?? null;
+		this.#data = raw;
+	}
+
+	public toString(): string {
+		return this.name ?? "";
 	}
 
 	/**
 	 * @internal
 	 */
 	public static fromData(data: AssignmentVO, cache: CacheInfo) {
-		return new Assignment(cache, {
-			abbreviation: data.abbreviation,
-			assignmentID: data.assignmentid != null ? +data.assignmentid : null!,
-			categoryID: data.categoryId != null ? +data.categoryId : null!,
-			courseDCID: data.sectionDcid != null ? +data.sectionDcid : null!,
-			courseID: data.sectionid != null ? +data.sectionid : null!,
-			description: data.description,
-			dueDate: data.dueDate ? new Date(data.dueDate) : null,
-			gradeBookType: data.gradeBookType != null ? +data.gradeBookType : null!,
-			id: data.id != null ? +data.id : null!,
-			includeInFinalGrades: data.includeinfinalgrades == 1,
-			name: data.name,
-			possiblePoints: data.pointspossible != null ? +data.pointspossible : null!,
-			publishDaysBeforeDue: data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null!,
-			publishOnSpecificDate: data.publishonspecificdate ? new Date(data.publishonspecificdate) : null,
-			publishScores: data.publishscores == 1,
-			publishState: data.publishState != null ? +data.publishState : null!,
-			type: data.type != null ? +data.type : null!,
-			weight: data.weight != null ? +data.weight : null!,
-		});
+		return new Assignment(
+			cache,
+			{
+				abbreviation: data.abbreviation,
+				assignmentID: data.assignmentid != null ? +data.assignmentid : null!,
+				categoryID: data.categoryId != null ? +data.categoryId : null!,
+				courseDCID: data.sectionDcid != null ? +data.sectionDcid : null!,
+				courseID: data.sectionid != null ? +data.sectionid : null!,
+				description: data.description,
+				dueDate: data.dueDate ? new Date(data.dueDate) : null,
+				gradeBookType: data.gradeBookType != null ? +data.gradeBookType : null!,
+				id: data.id != null ? +data.id : null!,
+				includeInFinalGrades: data.includeinfinalgrades == 1,
+				name: data.name,
+				possiblePoints: data.pointspossible != null ? +data.pointspossible : null!,
+				publishDaysBeforeDue: data.publishDaysBeforeDue != null ? +data.publishDaysBeforeDue : null!,
+				publishOnSpecificDate: data.publishonspecificdate ? new Date(data.publishonspecificdate) : null,
+				publishScores: data.publishscores == 1,
+				publishState: data.publishState != null ? +data.publishState : null!,
+				type: data.type != null ? +data.type : null!,
+				weight: data.weight != null ? +data.weight : null!,
+			},
+			data
+		);
 	}
 }
 

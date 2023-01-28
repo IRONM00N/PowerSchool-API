@@ -1,15 +1,15 @@
-import type AssignmentCategory from "./AssignmentCategory";
-import type AttendanceCode from "./AttendanceCode";
-import type AttendanceRecord from "./AttendanceRecord";
-import type Course from "./Course";
-import type Event from "./Event";
-import type FinalGrade from "./FinalGrade";
-import type Period from "./Period";
-import type ReportingTerm from "./ReportingTerm";
-import type School from "./School";
-import type Student from "./Student";
-import type Teacher from "./Teacher";
-import type Term from "./Term";
+import type AssignmentCategory from "./AssignmentCategory.js";
+import type AttendanceCode from "./AttendanceCode.js";
+import type AttendanceRecord from "./AttendanceRecord.js";
+import type Course from "./Course.js";
+import type Event from "./Event.js";
+import type FinalGrade from "./FinalGrade.js";
+import type Period from "./Period.js";
+import type ReportingTerm from "./ReportingTerm.js";
+import type School from "./School.js";
+import type Student from "./Student.js";
+import type Teacher from "./Teacher.js";
+import type Term from "./Term.js";
 
 /**
  * Holds information about the student.

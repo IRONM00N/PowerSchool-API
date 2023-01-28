@@ -1,4 +1,4 @@
-import { TeacherVO } from "../types";
+import type { TeacherVO } from "../types.js";
 
 /**
  * A PowerSchool teacher object.
